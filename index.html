@@ -102,7 +102,8 @@
 
 <script>
     const GAME_DATA_KEY = 'greenQuestGameData';
-
+    const WORKER_URL = "https://greenquestapi.mlwong3.workers.dev/"
+    
     const initialGameState = {
         gameStarted: false,
         level: 1, xp: 0, seeds: 100,
@@ -383,7 +384,7 @@
         }
     }
     
-    async function showPlantDetail(plant) {
+async function showPlantDetail(plant) {
         const loadingContent = `<div class="text-6xl mb-4">🌿</div><h3 class="text-2xl font-bold mb-2">${plant.name}</h3><p class="text-sm text-gray-500 italic mb-4">${plant.scientificName || ''}</p><div class="animate-spin rounded-full h-12 w-12 border-b-4 border-emerald-500 mx-auto mb-4"></div><p class="text-gray-600">AI 正在生成詳細資訊...</p>`;
         showModal(loadingContent);
         
@@ -395,15 +396,22 @@
         請提供以下資訊：
         { "flowerLanguage": "該植物的花語（如果有的話，沒有則回傳空字串）", "bloomingSeason": "該植物的花期或生長季節", "description": "簡短描述該植物的特徵、生長環境、用途等（約50-80字）" }`;
         
-        const API_KEY = "AIzaSyBSZv_OIB2CdrilAShQAXfmVy8_EuCkDEQ";
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+        // --- 修改部分開始 ---
+        // 這裡不再需要 API Key，直接發送請求給 Cloudflare Worker
         const payload = { 
             contents: [{ role: "user", parts: [{ text: prompt }] }], 
             generationConfig: { responseMimeType: "application/json" } 
         };
         
         try {
-            const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            // 使用 WORKER_URL 替代原本的 Google API URL
+            const response = await fetch(WORKER_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            // --- 修改部分結束 ---
+
             if (!response.ok) throw new Error(`API 請求失敗: ${response.status}`);
             const result = await response.json();
             const detailData = JSON.parse(result.candidates[0].content.parts[0].text);
@@ -543,7 +551,7 @@
         await identifyPlantAndCreateQuiz(base64Data, imageSrc);
     }
 
-    async function identifyPlantAndCreateQuiz(base64ImageData, imageSrc) {
+   async function identifyPlantAndCreateQuiz(base64ImageData, imageSrc) {
         const prompt = `你是一位專業的植物學家，請參考香港植物標本室（Hong Kong Herbarium）的分類標準來辨識圖片中的植物。請嚴格按照以下JSON格式回傳。
 
 請根據植物的科學分類學分類：
@@ -558,12 +566,23 @@
 請確保學名（scientificName）準確無誤，並優先使用香港及華南地區的常見植物名稱。
 
 { "plantName": "植物的中文名稱", "scientificName": "植物的拉丁學名（例如：Bauhinia × blakeana）", "plantType": "判斷植物屬於'非維管植物'、'蕨類植物'、'雙子葉植物'、'單子葉植物'、'裸子植物'或'非植物'", "funFact": "一段關於此植物的簡短有趣知識", "quiz": { "question": "根據知識點設計一個單選題", "options": ["選項A", "選項B", "正確答案C"], "correctAnswerIndex": 2 } }`;
-        const API_KEY = "AIzaSyBSZv_OIB2CdrilAShQAXfmVy8_EuCkDEQ";
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-        const payload = { contents: [{ role: "user", parts: [ { text: prompt }, { inlineData: { mimeType: "image/png", data: base64ImageData } } ] }], generationConfig: { responseMimeType: "application/json" } };
+        
+        // --- 修改部分開始 ---
+        // 這裡不再需要 API Key，直接發送請求給 Cloudflare Worker
+        const payload = { 
+            contents: [{ role: "user", parts: [ { text: prompt }, { inlineData: { mimeType: "image/png", data: base64ImageData } } ] }], 
+            generationConfig: { responseMimeType: "application/json" } 
+        };
 
         try {
-            const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            // 使用 WORKER_URL 替代原本的 Google API URL
+            const response = await fetch(WORKER_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            // --- 修改部分結束 ---
+
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error(`API 請求失敗: ${response.status}`, errorText);
@@ -602,6 +621,7 @@
             const today = getTodayString();
             const type = data.plantType;
             
+            // 處理任務邏輯保持不變
             if (type === '非維管植物' && gameState.tasks.feedNonVascular && !gameState.tasks.feedNonVascular.completedToday) {
                 gameState.tasks.feedNonVascular.completedToday = true;
                 gameState.tasks.feedNonVascular.lastFeedDate = today;
