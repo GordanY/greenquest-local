@@ -40,7 +40,7 @@ Both use the same payload format: `{ contents: [{ role, parts }], generationConf
 - **Pet evolution**: 2 pet types (`seed1`, `seed2`), 3 stages each. Evolution triggers at level 2 and level 3 via `checkEvolution()`.
 - **XP formula**: `calculateXpToNextLevel(level) = 2 * level`. Correct challenge = 5 XP, incorrect = 2 XP. Special feed doubles XP (`xpMultiplier`).
 - **Challenge system**: 6 categories (非維管植物, 維管植物, 無種子植物, 種子植物, 無花植物, 有花植物) shuffled randomly per round. AI validates if photographed plant matches the target category. `getChallengeData()` holds all pre-written hints, extra knowledge, descriptions, and icons.
-- **Plant classification** (for pokedex): 5 scientific types — 非維管植物, 蕨類植物, 雙子葉植物, 單子葉植物, 裸子植物.
+- **Plant classification** (for pokedex): 6 types matching the challenge categories — 非維管植物, 維管植物, 無種子植物, 種子植物, 無花植物, 有花植物.
 - **Daily tasks**: Reset via `checkDailyTasks()` comparing `lastFeedDate` against today's date string.
 
 ### Styling
