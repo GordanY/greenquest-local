@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs:*)",
+      "mcp__plugin_playwright_playwright__browser_type",
+      "Bash(kill:*)"
+    ]
+  }
+}
