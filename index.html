@@ -839,7 +839,7 @@ async function showPlantDetail(plant) {
             + '<div class="flex justify-around bg-emerald-50 rounded-lg p-3 mb-4 text-center">'
             + '<div><p class="text-xs text-gray-500">答對獎勵</p><p class="font-bold text-emerald-600">+' + (5 * xpMultiplier) + ' XP</p></div>'
             + '<div class="border-l border-emerald-200"></div>'
-            + '<div><p class="text-xs text-gray-500">答錯獎勵</p><p class="font-bold text-gray-400">+' + (2 * xpMultiplier) + ' XP</p></div>'
+            + '<div><p class="text-xs text-gray-500">答錯獎勵</p><p class="font-bold text-gray-400">+' + (1 * xpMultiplier) + ' XP</p></div>'
             + '</div>'
             + '<div class="grid grid-cols-2 gap-3">'
             + '<button id="challenge-camera-btn" class="btn bg-emerald-500 text-white p-4 rounded-lg font-semibold">📷 拍照</button>'
@@ -959,7 +959,7 @@ async function showPlantDetail(plant) {
     function renderChallengeResult(data, imageSrc, targetCategory, isCorrect) {
         const screen = screens.challenge;
         const { hints, extras } = getChallengeData();
-        const xpReward = (isCorrect ? 5 : 2) * gameState.xpMultiplier;
+        const xpReward = (isCorrect ? 5 : 1) * gameState.xpMultiplier;
 
         const plantInfoHtml = data.plantName
             ? '<div class="bg-white rounded-xl shadow-sm p-4 mb-4 text-center">'
