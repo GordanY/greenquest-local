@@ -29,8 +29,12 @@
         .competition-timer { font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
         .competition-timer.warning { color: #ef4444; animation: timer-pulse 1s ease-in-out infinite; }
         @keyframes timer-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .cooldown-ring { width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(#10b981 var(--cooldown-pct, 0%), #e5e7eb var(--cooldown-pct, 0%)); display: flex; align-items: center; justify-content: center; }
-        .cooldown-ring-inner { width: 68px; height: 68px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; color: #374151; }
+        .progress-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; transition: all 0.3s ease; }
+        .progress-dot.current { background: #10b981; color: white; transform: scale(1.2); box-shadow: 0 0 0 3px rgba(16,185,129,0.3); }
+        .progress-dot.correct { background: #10b981; color: white; }
+        .progress-dot.incorrect { background: #ef4444; color: white; }
+        .progress-dot.skipped { background: #9ca3af; color: white; }
+        .progress-dot.pending { background: #e5e7eb; color: #9ca3af; }
         .podium-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
         .podium-silver { background: linear-gradient(135deg, #d1d5db, #9ca3af); }
         .podium-bronze { background: linear-gradient(135deg, #d97706, #b45309); }
@@ -131,6 +135,8 @@
     function setWorkerUrl(url) { localStorage.setItem(WORKER_URL_KEY, url); }
 
     const ALL_CHALLENGE_CATEGORIES = ['非維管植物', '維管植物', '無種子植物', '種子植物', '無花植物', '有花植物'];
+    const COMPETITION_CATEGORIES = ['非維管植物', '維管植物', '裸子植物', '蕨類植物', '單子葉植物', '雙子葉植物', '有花植物', '無花植物', '無種子植物'];
+    const COMPETITION_TIME_LIMIT_MS = 60 * 60 * 1000;
 
     function shuffleArray(arr) {
         const a = [...arr];
@@ -296,6 +302,10 @@
                             monthlyScore: 0, monthlyCorrect: 0, monthlyWrong: 0,
                             monthlyMonth: null, monthlyPlantsFound: [], session: null,
                         };
+                    }
+                    // Migrate old competition session format (had targetCategory instead of types)
+                    if (gameState.competition.session && gameState.competition.session.targetCategory !== undefined) {
+                        gameState.competition.session = null;
                     }
 
                     checkEvolution();
@@ -696,6 +706,10 @@ async function showPlantDetail(plant) {
             '種子植物':   '種子植物用種子繁殖。開花植物和松樹、杉樹都是種子植物。試試找一棵結果或有毬果的樹木，或任何開花的植物。',
             '無花植物':   '無花植物（裸子植物）用毬果而非花朵繁殖。試試找松樹（Pine）、杉樹（Cypress）、銀杏（Ginkgo）或蘇鐵（Cycad）——它們的種子是「裸露」的，沒有果實包裹。',
             '有花植物':   '有花植物（被子植物）是最多樣的植物類群。無論是玫瑰、蘭花、向日葵還是禾草，只要會開花就算。試試在花圃或路邊找任何一種開花的植物。',
+            '裸子植物':   '裸子植物的種子裸露在外，沒有果實包裹。松樹（Pine）、杉樹（Cypress）、銀杏（Ginkgo）和蘇鐵（Cycad）都是裸子植物——尋找有毬果的樹木。',
+            '蕨類植物':   '蕨類植物沒有種子，靠孢子繁殖。注意它們特徵性的羽狀複葉，翻過來看葉背可能有棕色孢子囊群。在潮濕陰暗的林下或溪邊最容易找到。',
+            '單子葉植物': '單子葉植物的特徵是平行脈葉片、花瓣多為3的倍數。禾草、竹子、百合、蘭花、棕櫚、香蕉都是單子葉植物。',
+            '雙子葉植物': '雙子葉植物葉片通常有網狀脈，花瓣多為4或5的倍數。玫瑰、向日葵、豆科植物、大部分的樹木（楓、榕、木棉）都是雙子葉植物。',
         };
         const extras = {
             '非維管植物': '你找到了非維管植物！它們是最古老的陸生植物之一，在約4億7千萬年前率先登上陸地。苔蘚沒有根，靠整個葉狀體吸收水分，因此特別依賴潮濕環境——它們也是濕地生態系的重要指示物種。',
@@ -704,6 +718,10 @@ async function showPlantDetail(plant) {
             '種子植物':   '種子是植物的偉大發明——它為胚胎提供養分和保護，讓植物得以在乾燥環境中繁殖。正因如此，種子植物在大約3億年前開始主導陸地生態系，並演化出我們今日看到的繁茂多樣。',
             '無花植物':   '裸子植物的種子是「裸露」的，意思是沒有果實包裹。銀杏（Ginkgo biloba）是裸子植物中最古老的「活化石」，其祖先可追溯至2億7千萬年前，恐龍曾在銀杏樹下乘涼！香港的郊野公園中就有松樹和羅漢松等裸子植物。',
             '有花植物':   '被子植物是地球上最成功的植物類群，擁有超過30萬個已知種。它們與蜜蜂、蝴蝶等傳粉者共同演化，形成了地球生態系最重要的夥伴關係之一。從稻米、小麥到蘋果，人類的主食幾乎全來自被子植物。',
+            '裸子植物':   '裸子植物在距今約3億年前出現，是最早的種子植物。它們曾在恐龍時代主宰地球。銀杏是「活化石」，其形態在2億多年間幾乎沒有改變！',
+            '蕨類植物':   '蕨類植物在石炭紀（約3.5億年前）稱霸地球，巨大的樹蕨高達30公尺。今天的煤炭大多由那時的蕨類森林形成。全球現存約1萬種蕨類。',
+            '單子葉植物': '單子葉植物包含人類最重要的糧食作物：稻米、小麥、玉米。禾本科（草）覆蓋了地球陸地面積的約20%，是最成功的植物家族之一。',
+            '雙子葉植物': '雙子葉植物是被子植物中種類最多的一群，約佔開花植物的75%。從微小的野花到巨大的闊葉樹，雙子葉植物的多樣性令人驚歎。',
         };
         const descriptions = {
             '非維管植物': '找一種沒有維管束的植物，例如苔蘚、地衣或藻類。',
@@ -712,10 +730,15 @@ async function showPlantDetail(plant) {
             '種子植物':   '找一種用種子繁殖的植物——開花植物或毬果植物都算。',
             '無花植物':   '找一種用毬果繁殖的植物，例如松樹、杉樹、銀杏或蘇鐵。',
             '有花植物':   '找任何一種會開花的植物——路邊的野花或花圃的植物都可以。',
+            '裸子植物':   '找一種種子裸露、用毬果繁殖的植物，如松樹、杉樹、銀杏。',
+            '蕨類植物':   '找一種靠孢子繁殖的蕨類，注意羽狀複葉和葉背孢子囊。',
+            '單子葉植物': '找一種平行脈葉片的植物，如禾草、百合、棕櫚或竹子。',
+            '雙子葉植物': '找一種網狀脈葉片的開花植物，如玫瑰、向日葵或榕樹。',
         };
         const icons = {
             '非維管植物': '🌿', '維管植物': '🌱', '無種子植物': '🍃',
             '種子植物': '🌰', '無花植物': '🌲', '有花植物': '🌸',
+            '裸子植物': '🌲', '蕨類植物': '☘️', '單子葉植物': '🌾', '雙子葉植物': '🌻',
         };
         return { hints, extras, descriptions, icons };
     }
@@ -1056,7 +1079,6 @@ async function showPlantDetail(plant) {
     }
 
     // --- Competition Mode ---
-    const COMPETITION_COOLDOWN_MS = 60 * 1000;
     const FAKE_GPS_LOCATIONS = ['香港公園', '九龍公園', '嘉道理農場'];
     const FAKE_LEADERBOARD_PLAYERS = [
         { name: '植物博士小明', avatar: '🧑‍🔬' }, { name: '花花達人', avatar: '🌺' },
@@ -1099,17 +1121,6 @@ async function showPlantDetail(plant) {
         const m = Math.floor((totalSec % 3600) / 60);
         const s = totalSec % 60;
         return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-    }
-
-    function getCooldownRemaining() {
-        const session = gameState.competition.session;
-        if (!session || !session.lastPhotoTime) return 0;
-        return Math.max(0, (session.lastPhotoTime + COMPETITION_COOLDOWN_MS) - Date.now());
-    }
-
-    function getCooldownPercentage() {
-        const remaining = getCooldownRemaining();
-        return ((COMPETITION_COOLDOWN_MS - remaining) / COMPETITION_COOLDOWN_MS) * 100;
     }
 
     // Note: innerHTML usage in competition functions follows the same pattern as existing code —
@@ -1157,7 +1168,7 @@ async function showPlantDetail(plant) {
 
         const buttonHtml = hasActiveSession
             ? '<button id="competition-resume-btn" class="btn w-full bg-amber-500 text-white font-bold py-3 rounded-lg shadow-lg">⚡ 繼續競賽</button>'
-            : '<button id="competition-start-btn" class="btn w-full bg-emerald-500 text-white font-bold py-3 rounded-lg shadow-lg">⚡ 開始競賽（2小時）</button>';
+            : '<button id="competition-start-btn" class="btn w-full bg-emerald-500 text-white font-bold py-3 rounded-lg shadow-lg">⚡ 開始競賽（1小時）</button>';
 
         screen.innerHTML = '<div class="flex flex-col h-full">'
             + '<h2 class="text-xl sm:text-2xl font-bold text-center text-emerald-700 mb-2">競賽模式</h2>'
@@ -1204,15 +1215,13 @@ async function showPlantDetail(plant) {
                     + '<button class="modal-close-btn btn bg-emerald-500 text-white font-bold py-2 px-6 rounded-full w-full">開始競賽！</button>',
                     () => {
                         const now = Date.now();
-                        const category = ALL_CHALLENGE_CATEGORIES[Math.floor(Math.random() * ALL_CHALLENGE_CATEGORIES.length)];
                         gameState.competition.session = {
                             startTime: now,
-                            endTime: now + (2 * 60 * 60 * 1000),
-                            targetCategory: category,
-                            sessionScore: 0, sessionCorrect: 0, sessionWrong: 0,
-                            sessionPlantsFound: [],
-                            lastPhotoTime: null,
+                            endTime: now + COMPETITION_TIME_LIMIT_MS,
                             mockLocation: location,
+                            types: shuffleArray([...COMPETITION_CATEGORIES]),
+                            currentIndex: 0,
+                            results: {},
                         };
                         saveGameState();
                         showCompetitionActiveScreen();
@@ -1236,47 +1245,65 @@ async function showPlantDetail(plant) {
         const session = gameState.competition.session;
         if (!session) return;
         const remaining = Math.max(0, session.endTime - Date.now());
-        const { icons, descriptions } = getChallengeData();
-        const cooldownLeft = getCooldownRemaining();
+        const { icons, descriptions, hints } = getChallengeData();
         const timerWarning = remaining < 5 * 60 * 1000 ? ' warning' : '';
+        const isFinished = session.currentIndex >= session.types.length;
+        const currentType = isFinished ? null : session.types[session.currentIndex];
 
-        let cameraOrCooldownHtml;
-        if (cooldownLeft > 0) {
-            const pct = getCooldownPercentage();
-            cameraOrCooldownHtml = '<div class="flex flex-col items-center gap-2">'
-                + '<div class="cooldown-ring" id="cooldown-ring" style="--cooldown-pct: ' + pct + '%">'
-                + '<div class="cooldown-ring-inner"><span id="cooldown-text">' + Math.ceil(cooldownLeft / 1000) + 's</span></div>'
-                + '</div>'
-                + '<p class="text-xs text-gray-400">冷卻中，請稍候...</p>'
-                + '</div>';
+        // Build progress dots
+        let dotsHtml = '<div class="flex justify-center gap-1.5 flex-wrap mx-4 mt-3">';
+        session.types.forEach((type, i) => {
+            let dotClass = 'pending';
+            let dotContent = i + 1;
+            if (session.results[type]) {
+                const s = session.results[type].status;
+                dotClass = s;
+                dotContent = s === 'correct' ? '✓' : s === 'incorrect' ? '✗' : '—';
+            } else if (i === session.currentIndex) {
+                dotClass = 'current';
+            }
+            dotsHtml += '<div class="progress-dot ' + dotClass + '">' + dotContent + '</div>';
+        });
+        dotsHtml += '</div>';
+
+        // Action area
+        let actionHtml;
+        if (isFinished) {
+            actionHtml = '<button id="competition-finish-btn" class="btn w-full bg-emerald-500 text-white font-bold py-4 rounded-full shadow-lg text-lg">🏁 查看結果</button>';
         } else {
-            cameraOrCooldownHtml = '<button id="competition-camera-btn" class="btn bg-emerald-500 text-white font-bold py-4 px-8 rounded-full shadow-lg text-lg">📷 拍攝植物</button>';
+            actionHtml = '<div class="flex gap-3 w-full px-4">'
+                + '<button id="competition-camera-btn" class="btn flex-1 bg-emerald-500 text-white font-bold py-4 rounded-full shadow-lg">📷 拍攝植物</button>'
+                + '<button id="competition-skip-btn" class="btn flex-none bg-gray-200 text-gray-700 font-bold py-4 px-6 rounded-full shadow">⏩ 跳過</button>'
+                + '</div>';
+        }
+
+        // Current type card
+        let typeCardHtml = '';
+        if (!isFinished) {
+            typeCardHtml = '<div class="mx-4 mt-3 bg-white rounded-xl shadow-sm p-4 text-center">'
+                + '<p class="text-xs text-gray-400 mb-1">目標植物類別</p>'
+                + '<div class="text-4xl mb-2">' + (icons[currentType] || '🌿') + '</div>'
+                + '<h3 class="text-xl font-bold text-emerald-700">' + currentType + '</h3>'
+                + '<p class="text-sm text-gray-500 mt-1">' + (descriptions[currentType] || '') + '</p>'
+                + '<p class="text-xs text-gray-400 mt-2 leading-relaxed">' + (hints[currentType] || '') + '</p>'
+                + '</div>';
         }
 
         const screen = screens.competitionActive;
         screen.innerHTML = '<div class="flex flex-col h-full">'
             + '<div class="flex justify-between items-center p-4 bg-white shadow-sm">'
             + '<div class="text-center"><p class="text-xs text-gray-400">剩餘時間</p><p id="competition-timer" class="text-2xl font-bold text-gray-800 competition-timer' + timerWarning + '">' + formatCompetitionTime(remaining) + '</p></div>'
-            + '<div class="text-center"><p class="text-xs text-gray-400">分數</p><p id="competition-score" class="text-2xl font-bold text-emerald-600">' + session.sessionScore + '</p></div>'
+            + '<div class="text-center"><p class="text-xs text-gray-400">進度</p><p class="text-2xl font-bold text-emerald-600">第 ' + Math.min(session.currentIndex + 1, session.types.length) + ' / ' + session.types.length + ' 題</p></div>'
             + '</div>'
             + '<div class="mx-4 mt-3 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2">'
             + '<span class="text-blue-500">📍</span>'
             + '<span class="text-sm text-blue-700">' + session.mockLocation + '</span>'
             + '<span class="text-xs text-green-500 ml-auto">GPS 已定位</span>'
             + '</div>'
-            + '<div class="mx-4 mt-3 bg-white rounded-xl shadow-sm p-4 text-center">'
-            + '<p class="text-xs text-gray-400 mb-1">目標植物類別</p>'
-            + '<div class="text-4xl mb-2">' + (icons[session.targetCategory] || '🌿') + '</div>'
-            + '<h3 class="text-xl font-bold text-emerald-700">' + session.targetCategory + '</h3>'
-            + '<p class="text-sm text-gray-500 mt-1">' + (descriptions[session.targetCategory] || '') + '</p>'
-            + '</div>'
-            + '<div class="flex justify-around mx-4 mt-3 bg-gray-50 rounded-lg p-3 text-center">'
-            + '<div><p class="text-xs text-gray-400">答對</p><p class="font-bold text-emerald-600">' + session.sessionCorrect + '</p></div>'
-            + '<div><p class="text-xs text-gray-400">答錯</p><p class="font-bold text-red-400">' + session.sessionWrong + '</p></div>'
-            + '<div><p class="text-xs text-gray-400">植物數</p><p class="font-bold text-blue-600">' + session.sessionPlantsFound.length + '</p></div>'
-            + '</div>'
+            + dotsHtml
+            + typeCardHtml
             + '<div class="flex-grow flex items-center justify-center">'
-            + cameraOrCooldownHtml
+            + actionHtml
             + '</div>'
             + '<div class="px-4 pb-4">'
             + '<button id="competition-quit-btn" class="btn w-full bg-red-100 text-red-600 font-semibold py-3 rounded-lg border border-red-200 hover:bg-red-200 transition-colors">結束競賽</button>'
@@ -1285,6 +1312,10 @@ async function showPlantDetail(plant) {
 
         const cameraBtn = document.getElementById('competition-camera-btn');
         if (cameraBtn) cameraBtn.addEventListener('click', startCompetitionCamera);
+        const skipBtn = document.getElementById('competition-skip-btn');
+        if (skipBtn) skipBtn.addEventListener('click', skipCompetitionType);
+        const finishBtn = document.getElementById('competition-finish-btn');
+        if (finishBtn) finishBtn.addEventListener('click', () => endCompetitionSession(false));
         document.getElementById('competition-quit-btn').addEventListener('click', () => {
             showModal(
                 '<div class="text-6xl mb-4">⚠️</div>'
@@ -1302,6 +1333,20 @@ async function showPlantDetail(plant) {
         });
     }
 
+    function skipCompetitionType() {
+        const session = gameState.competition.session;
+        if (!session || session.currentIndex >= session.types.length) return;
+        const currentType = session.types[session.currentIndex];
+        session.results[currentType] = { status: 'skipped' };
+        session.currentIndex++;
+        saveGameState();
+        if (session.currentIndex >= session.types.length) {
+            endCompetitionSession(false);
+        } else {
+            renderCompetitionActiveUI();
+        }
+    }
+
     function startCompetitionTimer() {
         clearInterval(competitionTimerInterval);
         competitionTimerInterval = setInterval(() => {
@@ -1312,15 +1357,6 @@ async function showPlantDetail(plant) {
             if (timerEl) {
                 timerEl.textContent = formatCompetitionTime(remaining);
                 if (remaining < 5 * 60 * 1000) timerEl.classList.add('warning');
-            }
-            const cooldownRing = document.getElementById('cooldown-ring');
-            const cooldownText = document.getElementById('cooldown-text');
-            const cooldownLeft = getCooldownRemaining();
-            if (cooldownRing && cooldownLeft > 0) {
-                cooldownRing.style.setProperty('--cooldown-pct', getCooldownPercentage() + '%');
-                if (cooldownText) cooldownText.textContent = Math.ceil(cooldownLeft / 1000) + 's';
-            } else if (cooldownLeft <= 0 && cooldownRing) {
-                renderCompetitionActiveUI();
             }
             if (remaining <= 0) {
                 clearInterval(competitionTimerInterval);
@@ -1345,24 +1381,39 @@ async function showPlantDetail(plant) {
             return;
         }
 
-        const plantListHtml = session.sessionPlantsFound.length > 0
-            ? '<div class="text-left mt-3 mb-3"><p class="text-sm font-semibold text-gray-700 mb-1">找到的植物：</p><ul class="text-sm text-gray-600 list-disc pl-5">'
-              + session.sessionPlantsFound.map(p => '<li>' + p + '</li>').join('')
-              + '</ul></div>'
-            : '<p class="text-sm text-gray-500 mt-2 mb-3">本次沒有找到任何植物。</p>';
+        const { icons } = getChallengeData();
+        const correct = Object.values(session.results).filter(r => r.status === 'correct').length;
+        const incorrect = Object.values(session.results).filter(r => r.status === 'incorrect').length;
+        const skipped = Object.values(session.results).filter(r => r.status === 'skipped').length;
+
+        let resultsGridHtml = '<div class="text-left space-y-1.5 mb-3 max-h-48 overflow-y-auto">';
+        session.types.forEach(type => {
+            const result = session.results[type];
+            let statusIcon, statusText, textColor;
+            if (!result) { statusIcon = '⬜'; statusText = '未完成'; textColor = 'text-gray-400'; }
+            else if (result.status === 'correct') { statusIcon = '✅'; statusText = result.plantName || '正確'; textColor = 'text-emerald-600'; }
+            else if (result.status === 'incorrect') { statusIcon = '❌'; statusText = '錯誤'; textColor = 'text-red-400'; }
+            else { statusIcon = '⏩'; statusText = '跳過'; textColor = 'text-gray-400'; }
+            resultsGridHtml += '<div class="flex items-center gap-2 text-sm">'
+                + '<span>' + statusIcon + '</span>'
+                + '<span class="font-medium">' + (icons[type] || '') + ' ' + type + '</span>'
+                + '<span class="' + textColor + ' ml-auto">' + statusText + '</span>'
+                + '</div>';
+        });
+        resultsGridHtml += '</div>';
 
         showModal(
             '<div class="text-6xl mb-3">🏁</div>'
             + '<h3 class="text-2xl font-bold mb-2">競賽結束！</h3>'
             + '<div class="bg-emerald-50 rounded-lg p-4 mb-3">'
-            + '<p class="text-3xl font-bold text-emerald-700">' + session.sessionScore + ' 分</p>'
+            + '<p class="text-3xl font-bold text-emerald-700">' + correct + ' / ' + session.types.length + ' 正確</p>'
             + '</div>'
             + '<div class="flex justify-around mb-3 text-center">'
-            + '<div><p class="text-xs text-gray-500">答對</p><p class="font-bold text-emerald-600">' + session.sessionCorrect + '</p></div>'
-            + '<div><p class="text-xs text-gray-500">答錯</p><p class="font-bold text-red-400">' + session.sessionWrong + '</p></div>'
-            + '<div><p class="text-xs text-gray-500">植物數</p><p class="font-bold text-blue-600">' + session.sessionPlantsFound.length + '</p></div>'
+            + '<div><p class="text-xs text-gray-500">答對</p><p class="font-bold text-emerald-600">' + correct + '</p></div>'
+            + '<div><p class="text-xs text-gray-500">答錯</p><p class="font-bold text-red-400">' + incorrect + '</p></div>'
+            + '<div><p class="text-xs text-gray-500">跳過</p><p class="font-bold text-gray-400">' + skipped + '</p></div>'
             + '</div>'
-            + plantListHtml
+            + resultsGridHtml
             + '<button class="modal-close-btn btn bg-emerald-500 text-white font-bold py-2 px-6 rounded-full w-full">返回主頁</button>',
             () => {
                 gameState.competition.session = null;
@@ -1374,7 +1425,6 @@ async function showPlantDetail(plant) {
     }
 
     async function startCompetitionCamera() {
-        if (getCooldownRemaining() > 0) return;
         try {
             videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             document.getElementById('competition-camera-feed').srcObject = videoStream;
@@ -1405,26 +1455,29 @@ async function showPlantDetail(plant) {
 
     async function processCompetitionImage(base64Data, imageSrc) {
         const session = gameState.competition.session;
-        if (!session || competitionIsProcessing) return;
+        if (!session || competitionIsProcessing || session.currentIndex >= session.types.length) return;
         competitionIsProcessing = true;
 
         Object.values(screens).forEach(s => s && s.classList.add('hidden'));
         screens.loading.classList.remove('hidden');
 
-        const targetCategory = session.targetCategory;
+        const targetCategory = session.types[session.currentIndex];
         const prompt = '你是一位植物學教師。請分析圖片中的植物，並判斷它是否屬於「' + targetCategory + '」這個類別。\n\n'
             + '首先，請確認圖片中是否有植物。若無植物，回傳 isPlant: false。\n\n'
             + '若有植物，請根據以下定義判斷它是否屬於目標類別：\n'
             + '- 非維管植物：苔蘚、地衣、藻類等沒有維管束的植物\n'
             + '- 維管植物：所有蕨類植物、裸子植物、被子植物（有根莖葉維管束系統的植物）\n'
             + '- 無種子植物：僅限蕨類植物及其近親（有維管束但靠孢子繁殖）\n'
-            + '- 種子植物：所有裸子植物（松、杉、銀杏）和被子植物（開花植物）\n'
-            + '- 無花植物：僅限裸子植物（松、杉、柏、銀杏、蘇鐵，種子裸露無果實）\n'
-            + '- 有花植物：所有被子植物（單子葉和雙子葉，開花並有果實包裹種子）\n\n'
+            + '- 裸子植物：松、杉、柏、銀杏、蘇鐵等，種子裸露在毬果中，沒有果實包裹\n'
+            + '- 蕨類植物：靠孢子繁殖的維管植物，有羽狀複葉，包括蕨、石松、木賊\n'
+            + '- 單子葉植物：種子有一片子葉的被子植物，平行脈葉片，如禾草、百合、蘭花、棕櫚\n'
+            + '- 雙子葉植物：種子有兩片子葉的被子植物，網狀脈葉片，如玫瑰、豆科、菊科\n'
+            + '- 有花植物：所有被子植物（單子葉和雙子葉，開花並有果實包裹種子）\n'
+            + '- 無花植物：僅限裸子植物（松、杉、柏、銀杏、蘇鐵，種子裸露無果實）\n\n'
             + '目標類別：' + targetCategory + '\n\n'
             + '請嚴格按照以下JSON格式回傳（不要加任何解釋）：\n'
             + '{ "isPlant": true, "matchesCategory": true, "plantName": "植物中文名", "scientificName": "拉丁學名", '
-            + '"plantType": "非維管植物、維管植物、無種子植物、種子植物、無花植物、有花植物 之一", '
+            + '"plantType": "非維管植物、維管植物、無種子植物、裸子植物、蕨類植物、單子葉植物、雙子葉植物、有花植物、無花植物 之一", '
             + '"funFact": "簡短有趣知識（30字左右）" }\n\n'
             + '若不是植物，回傳：\n'
             + '{ "isPlant": false, "matchesCategory": false, "plantName": "", "scientificName": "", "plantType": "", "funFact": "" }';
@@ -1443,51 +1496,51 @@ async function showPlantDetail(plant) {
             const result = await response.json();
             const data = JSON.parse(result.candidates[0].content.parts[0].text);
 
-            session.lastPhotoTime = Date.now();
-
             if (!data.isPlant) {
                 competitionIsProcessing = false;
-                saveGameState();
                 showModal('<div class="text-6xl mb-4">🤔</div><h3 class="text-2xl font-bold mb-2">這不是植物喔</h3><p class="text-gray-600 mb-6">請找一種植物來拍攝！</p><button class="modal-close-btn btn bg-emerald-500 text-white font-bold py-2 px-6 rounded-full">繼續</button>', () => {
                     showCompetitionActiveScreen(); startCompetitionTimer();
                 });
                 return;
             }
 
+            // Store result and advance
             if (data.matchesCategory) {
-                session.sessionScore++;
-                session.sessionCorrect++;
+                session.results[targetCategory] = { status: 'correct', plantName: data.plantName, scientificName: data.scientificName, funFact: data.funFact };
                 gameState.competition.monthlyScore++;
                 gameState.competition.monthlyCorrect++;
-                if (data.plantName) {
-                    session.sessionPlantsFound.push(data.plantName);
-                    if (!gameState.competition.monthlyPlantsFound.includes(data.plantName)) {
-                        gameState.competition.monthlyPlantsFound.push(data.plantName);
-                    }
+                if (data.plantName && !gameState.competition.monthlyPlantsFound.includes(data.plantName)) {
+                    gameState.competition.monthlyPlantsFound.push(data.plantName);
                 }
             } else {
-                session.sessionWrong++;
+                session.results[targetCategory] = { status: 'incorrect', plantName: data.plantName || '', funFact: data.funFact || '' };
                 gameState.competition.monthlyWrong++;
-                session.sessionScore = Math.max(0, session.sessionScore - 1);
-                gameState.competition.monthlyScore = Math.max(0, gameState.competition.monthlyScore - 1);
             }
+            session.currentIndex++;
             saveGameState();
 
+            const correct = Object.values(session.results).filter(r => r.status === 'correct').length;
             const icon = data.matchesCategory ? '✅' : '❌';
-            const title = data.matchesCategory ? '正確！+1 分' : '錯誤！-1 分';
+            const title = data.matchesCategory ? '正確！' : '答錯了';
             const color = data.matchesCategory ? 'emerald' : 'red';
+            const afterModalFn = () => {
+                if (session.currentIndex >= session.types.length) {
+                    endCompetitionSession(false);
+                } else {
+                    showCompetitionActiveScreen(); startCompetitionTimer();
+                }
+            };
             showModal(
                 '<div class="text-6xl mb-4">' + icon + '</div>'
                 + '<h3 class="text-2xl font-bold mb-2 text-' + color + '-700">' + title + '</h3>'
                 + (data.plantName ? '<p class="text-sm text-gray-600 mt-2">' + data.plantName + '</p>' : '')
-                + '<p class="text-lg font-bold text-gray-700 mt-2">目前分數：' + session.sessionScore + '</p>'
-                + '<button class="modal-close-btn btn bg-emerald-500 text-white font-bold py-2 px-6 rounded-full mt-4">繼續</button>',
-                () => { showCompetitionActiveScreen(); startCompetitionTimer(); }
+                + (data.funFact ? '<p class="text-xs text-gray-400 mt-1">' + data.funFact + '</p>' : '')
+                + '<p class="text-lg font-bold text-gray-700 mt-3">目前正確：' + correct + ' / ' + session.types.length + '</p>'
+                + '<button class="modal-close-btn btn bg-emerald-500 text-white font-bold py-2 px-6 rounded-full mt-4">' + (session.currentIndex >= session.types.length ? '查看結果' : '下一題') + '</button>',
+                afterModalFn
             );
         } catch (error) {
             console.error("Competition API error:", error);
-            session.lastPhotoTime = Date.now();
-            saveGameState();
             showModal('<div class="text-6xl mb-4">😢</div><h3 class="text-2xl font-bold mb-2">分析失敗</h3><p class="text-gray-600 mb-6">無法辨識圖片，請稍後再試。</p><button class="modal-close-btn btn bg-emerald-500 text-white font-bold py-2 px-6 rounded-full">繼續</button>', () => {
                 showCompetitionActiveScreen(); startCompetitionTimer();
             });
