@@ -1,0 +1,31 @@
+{
+  "name": "greenquest-test",
+  "main": "src/worker.js",
+  "workers_dev": true,
+  "preview_urls": false,
+  "compatibility_date": "2026-03-02",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
+  },
+  "placement": {
+    // Use one of the following options (mutually exclusive):
+    "region": "gcp:us-east4" // Explicit cloud region to run your Worker closest to - e.g. "gcp:us-east4" or "aws:us-east-1"
+    //"host": "db.example.com:5432", // A host to probe (TCP/layer 4) - e.g. a database host - and place your Worker closest to
+    //"hostname": "api.example.com", // A hostname to probe (HTTP/layer 7) - e.g. an API endpoint - and place your Worker closest to
+  },
+  "ai": {
+    "binding": "AI"
+  }
+}

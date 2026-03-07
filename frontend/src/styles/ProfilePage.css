@@ -1,0 +1,36 @@
+/* Container to handle the absolute positioning from your original code */
+.start-screen-container {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  width: 100%;
+  height: 100%;
+}
+
+/* Pet Card Styling */
+.pet-choice-card {
+  border-radius: 1rem; /* rounded-2xl */
+  padding: 0.5rem;
+  cursor: pointer;
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border: 3px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.pet-choice-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* Active/Selected State */
+.pet-choice-card.active {
+  border-color: #10b981; /* emerald-500 */
+  background-color: #f0fdf4; /* emerald-50 */
+  transform: scale(1.05);
+}
+
+/* Button Pulse Effect (Optional) */
+.btn:active {
+  transform: scale(0.98);
+}

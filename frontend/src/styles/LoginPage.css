@@ -1,0 +1,338 @@
+/* App.css */
+* {
+  box-sizing: border-box;
+}
+
+.app-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.header-section {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 28rem;
+  text-align: center;
+}
+
+.icon-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.shield-bg {
+  height: 3.5rem;
+  width: 3.5rem;
+  background-color: #4f46e5;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(199, 210, 254, 1);
+}
+
+.shield-icon {
+  height: 2rem;
+  width: 2rem;
+  color: white;
+}
+
+.title {
+  margin-top: 1.5rem;
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.card-wrapper {
+  margin-top: 2rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.card {
+  background-color: white;
+  padding: 2rem 1rem;
+  box-shadow: 0 20px 25px -5px rgba(226, 232, 240, 0.5);
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+.notification {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.notification.error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fee2e2;
+}
+
+.notification.success {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #dcfce3;
+}
+
+.notification-icon {
+  height: 1.25rem;
+  width: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.error .notification-icon { color: #dc2626; }
+.success .notification-icon { color: #16a34a; }
+
+.auth-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth0-btn {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  background-color: #4f46e5;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth0-btn:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.auth0-btn:disabled, .join-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.divider {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.divider-line-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+}
+
+.divider-line {
+  width: 100%;
+  border-top: 1px solid #e2e8f0;
+}
+
+.divider-text-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.divider-text {
+  padding: 0 0.75rem;
+  background-color: white;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.guest-form {
+  background-color: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+}
+
+.guest-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.guest-description {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.input-wrapper {
+  position: relative;
+  flex-grow: 1;
+}
+
+.input-icon-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding-left: 0.75rem;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.input-icon {
+  height: 1.25rem;
+  width: 1.25rem;
+  color: #94a3b8;
+}
+
+.access-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  outline: none;
+  font-family: monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.access-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.join-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4338ca;
+  background-color: #e0e7ff;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  /* Add these two lines to prevent it from shrinking */
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.join-btn:hover:not(:disabled) {
+  background-color: #c7d2fe;
+}
+
+.join-btn:disabled {
+  opacity: 0.5;
+}
+
+.btn-icon-small {
+  height: 1rem;
+  width: 1rem;
+}
+
+/* New Vertical Grouping */
+.input-group-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* Space between inputs and button */
+}
+
+/* Adjusting the nickname input specifically */
+.nickname-input {
+  letter-spacing: normal; /* Nicknames don't need wide tracking like codes */
+  text-transform: none;   /* Don't force uppercase for names */
+  font-family: inherit;   /* Standard font for names */
+}
+
+/* A full-width version of your join button */
+.join-btn-full {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the text and icon */
+  gap: 0.5rem;
+  padding: 0.875rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  background-color: #4f46e5; /* Using the primary brand color */
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.join-btn-full:hover:not(:disabled) {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.join-btn-full:disabled {
+  background-color: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Optional: Subtle label for the second input if you don't use icons */
+.input-wrapper::after {
+  content: attr(data-label);
+  display: block;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}

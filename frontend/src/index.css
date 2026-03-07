@@ -1,0 +1,13 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  touch-action: manipulation;
+  margin: 0;
+}
+
+input[type="file"] {
+  display: none;
+}

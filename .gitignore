@@ -1,0 +1,4 @@
+original/**
+frontend/node_modules/**
+backend/spacetimedb/node_modules/**
+.claude/**
