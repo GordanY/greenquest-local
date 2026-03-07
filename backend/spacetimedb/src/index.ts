@@ -56,7 +56,7 @@ const upload_records = table(
 const class_sessions = table(
   { public: true },
   {
-    access_code: t.string().index("btree"), 
+    access_code: t.string().index("btree"),
     creator_id: t.identity(),
     start_time: t.number(),
     end_time: t.number(),
@@ -70,25 +70,36 @@ const class_sessions_uploads = table(
   { public: true },
   {
     access_code: t.string(), // foreign key to class_sessions.access_code
-    creator_nickname: t.string(), 
+    creator_nickname: t.string(),
     mimeType: t.string(),
     photo_blob: t.array(t.u8()),
     plant_answer_type: t.string(),
+    reason: t.string(),
     plant_correct_name: t.string(),
+    plant_correct_scientific_name: t.string(),
     plant_correct_type: t.string(),
+    plant_correct_fun_fact: t.string(),
     timestamp: t.number(),
   }
 );
 
+const ai_proxy_url = table(
+  { public: false },
+  {
+    url: t.string().primaryKey()
+  }
+)
+
 
 const spacetimedb = schema({
-  user, 
+  user,
   admin_activate_key,
   user_profile,
   plant_types,
   upload_records,
   class_sessions,
   class_sessions_uploads,
+  ai_proxy_url
 });
 export default spacetimedb;
 
@@ -222,15 +233,15 @@ export const init = spacetimedb.init(ctx => {
   });
 });
 
-export const activate_admin = spacetimedb.reducer({ key: t.string() }, (ctx, {key}) => {
+export const activate_admin = spacetimedb.reducer({ key: t.string() }, (ctx, { key }) => {
   const record = ctx.db.admin_activate_key.key.find(key);
   if (record && record.active) {
     // Activate admin privileges for the user
     const user = ctx.db.user.id.find(ctx.sender);
-    if(user) { 
-      ctx.db.user.id.update({...user, role: 'admin' });
+    if (user) {
+      ctx.db.user.id.update({ ...user, role: 'admin' });
       return;
-    }else{
+    } else {
       throw new SenderError('User not found');
     }
   } else {
@@ -240,7 +251,7 @@ export const activate_admin = spacetimedb.reducer({ key: t.string() }, (ctx, {ke
 
 export const create_class_session = spacetimedb.reducer({ access_code: t.string(), duration_minutes: t.number() }, (ctx, { access_code, duration_minutes }) => {
   const user = ctx.db.user.id.find(ctx.sender);
-  if(user && user.role === 'admin') {
+  if (user && user.role === 'admin') {
     ctx.db.class_sessions.insert({
       access_code,
       creator_id: ctx.sender,
@@ -248,7 +259,7 @@ export const create_class_session = spacetimedb.reducer({ access_code: t.string(
       end_time: Date.now() + duration_minutes * 60 * 1000,
     });
     return;
-  } else {  
+  } else {
     throw new SenderError('Unauthorized error: create class session');
   }
 });
@@ -276,7 +287,7 @@ export const create_new_user = spacetimedb.reducer({ name: t.string(), pet_type:
   });
 });
 
-export const get_user_profile = spacetimedb.view({name: 'my_profile', public: true}, t.option(user_profile.rowType), ctx => {
+export const get_user_profile = spacetimedb.view({ name: 'my_profile', public: true }, t.option(user_profile.rowType), ctx => {
   const user_profile = ctx.db.user_profile.user_id.find(ctx.sender);
   if (!user_profile) {
     throw new SenderError('User profile not found');
@@ -286,7 +297,7 @@ export const get_user_profile = spacetimedb.view({name: 'my_profile', public: tr
 
 export const upload_plant_photo = spacetimedb.reducer({ mimeType: t.string(), photo_blob: t.array(t.u8()), plant_name: t.string(), plant_type: t.string() }, (ctx, { mimeType, photo_blob, plant_name, plant_type }) => {
   const user = ctx.db.user.id.find(ctx.sender);
-  if(!user) {
+  if (!user) {
     throw new SenderError('User not found');
   }
   ctx.db.upload_records.insert({
@@ -298,6 +309,90 @@ export const upload_plant_photo = spacetimedb.reducer({ mimeType: t.string(), ph
     timestamp: Date.now(),
   });
 });
+
+
+
+export const call_ai_model = spacetimedb.procedure(
+  { access_code: t.string(), nickname: t.string(), plant_answer_type: t.string(), reason: t.string(), photo_blob: t.array(t.u8()) },
+  t.bool(),
+  (ctx, { access_code, nickname, plant_answer_type, reason, photo_blob }) => {
+    const prompt = '你是一位植物學教師。請分析圖片中的植物，並判斷它是否屬於「' + plant_answer_type + '」這個類別。\n\n'
+      + '首先，請確認圖片中是否有植物。若無植物，回傳 isPlant: false。\n\n'
+      + '若有植物，請根據以下定義判斷它是否屬於目標類別：\n'
+      + '- 非維管植物：苔蘚、地衣、藻類等沒有維管束的植物\n'
+      + '- 維管植物：所有蕨類植物、裸子植物、被子植物（有根莖葉維管束系統的植物）\n'
+      + '- 無種子植物：僅限蕨類植物及其近親（有維管束但靠孢子繁殖）\n'
+      + '- 種子植物：所有裸子植物（松、杉、銀杏）和被子植物（開花植物）\n'
+      + '- 無花植物：僅限裸子植物（松、杉、柏、銀杏、蘇鐵，種子裸露無果實）\n'
+      + '- 有花植物：所有被子植物（單子葉和雙子葉，開花並有果實包裹種子）\n\n'
+      + '目標類別：' + plant_answer_type + '\n\n'
+      + '請嚴格按照以下JSON格式回傳（不要加任何解釋）：\n'
+      + '{ "isPlant": true, "matchesCategory": true, "plantName": "植物中文名", "scientificName": "拉丁學名", '
+      + '"plantType": "非維管植物、維管植物、無種子植物、種子植物、無花植物、有花植物 之一", '
+      + '"funFact": "簡短有趣知識（30字左右）" }\n\n'
+      + '若不是植物，回傳：\n'
+      + '{ "isPlant": false, "matchesCategory": false, "plantName": "", "scientificName": "", "plantType": "", "funFact": "" }';
+
+    const payload = {
+      contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: "image/png", data: photo_blob } }] }],
+      generationConfig: { responseMimeType: "application/json" }
+    };
+
+    const proxy_url = ctx.withTx(ctx => {
+      return ctx.db.ai_proxy_url.iter().next().value?.url;
+    });
+
+    console.log(`proxy_url = ${proxy_url}`);
+    if (!proxy_url) {
+      throw new SenderError(`ai_proxy_url is empty`);
+    }
+
+    const response = ctx.http.fetch(proxy_url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.status !== 200) {
+      throw new SenderError(`API returned status ${response.status}`);
+    }
+
+    const data = response.json();
+    const aiResponse = data.candidates?.[0]?.content?.parts?.text;
+
+    if (!aiResponse) {
+      throw new SenderError('Failed to parse AI response');
+    }
+
+    const aiResponseJson = JSON.parse(aiResponse);
+
+    if (!aiResponseJson) {
+      throw new SenderError('Failed to parse AI response');
+    }
+
+    const { isPlant, plantName: plant_correct_name, scientificName: plant_correct_scientific_name, plantType: plant_correct_type, funFact: plant_correct_fun_fact } = aiResponseJson;
+
+    if (isPlant) {
+      // Store the conversation in the database
+      ctx.withTx(txCtx => {
+        txCtx.db.class_sessions_uploads.insert({
+          access_code,
+          creator_nickname: nickname,
+          mimeType: "image/png",
+          photo_blob,
+          plant_answer_type,
+          reason,
+          plant_correct_name,
+          plant_correct_scientific_name,
+          plant_correct_type,
+          plant_correct_fun_fact,
+          timestamp: Date.now()
+        });
+      });
+    }
+
+    return true;
+  });
 
 export const onConnect = spacetimedb.clientConnected(_ctx => {
   // Called every time a new client connects
