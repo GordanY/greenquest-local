@@ -1,5 +1,6 @@
 import { useModeContext } from "../context/ModeContext";
 import GuestHome from "./guest/GuestHome";
+import GuestProfileProvider from "./guest/GuestProfileProvider";
 import UserHome from "./user/UserHome";
 
 export function HomePage(){
@@ -12,7 +13,9 @@ export function HomePage(){
             }
             {
                 mode === 'guest' &&
-                <GuestHome/>
+                <GuestProfileProvider>
+                    <GuestHome/>
+                </GuestProfileProvider>
             }
 
         </div>
