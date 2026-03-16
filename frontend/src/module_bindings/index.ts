@@ -41,6 +41,7 @@ import CreateNewUserReducer from "./create_new_user_reducer";
 import RemoveAiProxyUrlReducer from "./remove_ai_proxy_url_reducer";
 
 // Import all procedure arg schemas
+import * as GetPlantDetailProcedure from "./get_plant_detail_procedure";
 import * as GuestCallAiModelProcedure from "./guest_call_ai_model_procedure";
 import * as UserCallAiModelProcedure from "./user_call_ai_model_procedure";
 
@@ -122,6 +123,7 @@ const reducersSchema = __reducers(
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */
 const proceduresSchema = __procedures(
+  __procedureSchema("get_plant_detail", GetPlantDetailProcedure.params, GetPlantDetailProcedure.returnType),
   __procedureSchema("guest_call_ai_model", GuestCallAiModelProcedure.params, GuestCallAiModelProcedure.returnType),
   __procedureSchema("user_call_ai_model", UserCallAiModelProcedure.params, UserCallAiModelProcedure.returnType),
 );

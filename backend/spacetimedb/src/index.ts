@@ -385,7 +385,7 @@ export const user_call_ai_model = spacetimedb.procedure(
       throw new SenderError(`ai_proxy_url is empty`);
     }
 
-    const aiResponse = call_ai_model(ctx, proxy_url, { plant_answer_type, reason, photo_blob });
+    const aiResponse = call_ai_model(ctx, proxy_url, { plant_answer_type, reason, photo_blob: photo_blob.split(',')[1] });
 
     const { is_plant, plant_correct_name, plant_correct_scientific_name, plant_correct_type, plant_correct_fun_fact } = aiResponse;
 
@@ -429,7 +429,7 @@ export const guest_call_ai_model = spacetimedb.procedure(
       throw new SenderError(`ai_proxy_url is empty`);
     }
 
-    const aiResponse = call_ai_model(ctx, proxy_url, { plant_answer_type, reason, photo_blob });
+    const aiResponse = call_ai_model(ctx, proxy_url, { plant_answer_type, reason, photo_blob: photo_blob.split(',')[1] });
 
     const { is_plant, plant_correct_name, plant_correct_scientific_name, plant_correct_type, plant_correct_fun_fact } = aiResponse;
 
@@ -460,6 +460,70 @@ export const guest_call_ai_model = spacetimedb.procedure(
       plant_correct_fun_fact
     };
   });
+
+const PLANT_DETAIL_RESPONSE = t.object('plant_detail', {
+  flower_language: t.string(),
+  blooming_season: t.string(),
+  description: t.string()
+});
+
+export const get_plant_detail = spacetimedb.procedure(
+  { plant_name: t.string(), plant_scientific_name: t.string(), plant_type: t.string() },
+  PLANT_DETAIL_RESPONSE,
+  (ctx, { plant_name, plant_scientific_name, plant_type }) => {
+    const proxy_url = ctx.withTx(txCtx => {
+      return txCtx.db.ai_proxy_url.iter().next().value?.url;
+    });
+
+    console.log(`proxy_url = ${proxy_url}`);
+    if (!proxy_url) {
+      throw new SenderError(`ai_proxy_url is empty`);
+    }
+
+    const prompt = `請為以下植物生成詳細介紹,嚴格按照JSON格式回傳:
+        植物名稱：${plant_name}
+        ${plant_scientific_name ? `學名：${plant_scientific_name}` : ''}
+        植物類型：${plant_type}
+
+        請提供以下資訊：
+        { "flowerLanguage": "該植物的花語（如果有的話，沒有則回傳空字串）", "bloomingSeason": "該植物的花期或生長季節", "description": "簡短描述該植物的特徵、生長環境、用途等(約50-80字)" }`;
+
+    const payload = {
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { responseMimeType: "application/json" }
+    };
+
+    let response;
+    try {
+      response = ctx.http.fetch(proxy_url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        timeout: TimeDuration.fromMillis(30000)
+      });
+      console.log(`Response status: ${response.status}`);
+    } catch (err) {
+      throw new SenderError(`Error in http fetch: (res: ${JSON.stringify(response)}) ${String(err)}`);
+    }
+
+    if (response.status !== 200) {
+      throw new SenderError(`API returned status ${response.status} ${response.text()}`);
+    }
+
+    const data = response.json();
+    const aiResponse = JSON.parse(data.candidates[0].content.parts[0].text);
+
+    if (!aiResponse) {
+      throw new SenderError(`Failed to parse AI response`);
+    }
+
+    return {
+      flower_language: aiResponse.flowerLanguage || '',
+      blooming_season: aiResponse.bloomingSeason || '',
+      description: aiResponse.description || ''
+    };
+  }
+);
 
 export const onConnect = spacetimedb.clientConnected(_ctx => {
   // Called every time a new client connects

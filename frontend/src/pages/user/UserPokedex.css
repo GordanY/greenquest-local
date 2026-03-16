@@ -1,0 +1,14 @@
+.pokedex-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+}
+
+.pokedex-card {
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease-in-out;
+}
+
+.pokedex-card:hover {
+    transform: translateY(-2px);
+}

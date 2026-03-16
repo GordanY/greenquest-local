@@ -56,6 +56,13 @@ export type Data = __Infer<typeof Data>;
 export const GetUserProfile = __t.object("GetUserProfile", {});
 export type GetUserProfile = __Infer<typeof GetUserProfile>;
 
+export const PlantDetail = __t.object("PlantDetail", {
+  flowerLanguage: __t.string(),
+  bloomingSeason: __t.string(),
+  description: __t.string(),
+});
+export type PlantDetail = __Infer<typeof PlantDetail>;
+
 export const PlantTypes = __t.object("PlantTypes", {
   name: __t.string(),
   description: __t.string(),

@@ -6,9 +6,12 @@
 import { type Infer as __Infer } from "spacetimedb";
 
 // Import all procedure arg schemas
+import * as GetPlantDetailProcedure from "../get_plant_detail_procedure";
 import * as GuestCallAiModelProcedure from "../guest_call_ai_model_procedure";
 import * as UserCallAiModelProcedure from "../user_call_ai_model_procedure";
 
+export type GetPlantDetailArgs = __Infer<typeof GetPlantDetailProcedure.params>;
+export type GetPlantDetailResult = __Infer<typeof GetPlantDetailProcedure.returnType>;
 export type GuestCallAiModelArgs = __Infer<typeof GuestCallAiModelProcedure.params>;
 export type GuestCallAiModelResult = __Infer<typeof GuestCallAiModelProcedure.returnType>;
 export type UserCallAiModelArgs = __Infer<typeof UserCallAiModelProcedure.params>;

@@ -53,14 +53,14 @@ export default function GuestHome() {
         return;
       }
 
-      const photoData = photoBlob.split(',')[1];
+      // const photoData = photoBlob.split(',')[1];
 
       const response = await conn.procedures.guestCallAiModel({
         accessCode: accessCode,
         nickname: nickname,
         plantAnswerType: currentPlantType.name,
         reason: reason.trim(),
-        photoBlob: photoData,
+        photoBlob,
       });
 
       console.log(JSON.stringify(response, null, 2))

@@ -170,12 +170,12 @@ export function UserChallengeLoadingAnswer({ plantAnswerType, reason, photoBlob,
 
   useEffect(() => {
     const conn = getConnection();
-    const blob = photoBlob.split(',')[1];
+    // const blob = photoBlob.split(',')[1];
     if (conn) {
       conn.procedures.userCallAiModel({
         plantAnswerType,
         reason: reason.trim(),
-        photoBlob: blob,
+        photoBlob,
       }).then(response => {
         if (response) {
           setAIResponse(response);
