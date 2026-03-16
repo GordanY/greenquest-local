@@ -21,18 +21,34 @@ export default {
     console.log(url);
 
     // 轉發前端的請求內容
-    const body = await request.json();
-    
+    // Optimization: Stream the request body directly to avoid memory issues with large payloads
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: request.body,
     });
 
-    const data = await response.json();
+    // Safely handle the response text first
+    const textData = await response.text();
+    let data;
 
-    // 回傳結果給前端，並帶上 CORS Header
+    try {
+      // Try to parse it as JSON
+      data = JSON.parse(textData);
+    } catch (e) {
+      // If Gemini sends back an HTML/Text error, return it gracefully so you can debug!
+      return new Response(textData, {
+        status: response.status,
+        headers: {
+          "Content-Type": "text/plain",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }
+
+    // If it is JSON, return it as normal
     return new Response(JSON.stringify(data), {
+      status: response.status,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

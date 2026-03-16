@@ -11,8 +11,7 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  accessCode: __t.string().name("access_code"),
-  creatorNickname: __t.string().name("creator_nickname"),
+  userId: __t.identity().name("user_id"),
   mimeType: __t.string().name("mime_type"),
   photoBlob: __t.string().name("photo_blob"),
   plantAnswerType: __t.string().name("plant_answer_type"),

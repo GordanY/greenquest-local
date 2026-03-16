@@ -10,9 +10,8 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-export default {
-  mimeType: __t.string(),
-  photoBlob: __t.byteArray(),
-  plantName: __t.string(),
-  plantType: __t.string(),
-};
+export default __t.row({
+  id: __t.identity().primaryKey(),
+  name: __t.string(),
+  role: __t.string(),
+});

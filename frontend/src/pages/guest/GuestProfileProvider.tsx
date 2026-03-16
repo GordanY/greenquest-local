@@ -48,8 +48,13 @@ export default function GuestProfileProvider({children}: {children: React.ReactN
         return setReady(false);
     }
 
+    const contextValue: GuestProfile = {
+        accessCode,
+        nickname,
+    };
+
     return (
-        <div>
+        <GuestProfileContext.Provider value={contextValue}>
             {ready && children}
             {!ready && (<form onSubmit={handleSubmit}>
                 <input
@@ -90,7 +95,7 @@ export default function GuestProfileProvider({children}: {children: React.ReactN
                     Join
                 </button>
             </form>)}
-        </div>
+        </GuestProfileContext.Provider>
     );
 }
 

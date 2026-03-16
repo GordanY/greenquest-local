@@ -35,18 +35,22 @@ import {
 
 // Import all reducer arg schemas
 import ActivateAdminReducer from "./activate_admin_reducer";
+import AddAiProxyUrlReducer from "./add_ai_proxy_url_reducer";
 import CreateClassSessionReducer from "./create_class_session_reducer";
 import CreateNewUserReducer from "./create_new_user_reducer";
-import UploadPlantPhotoReducer from "./upload_plant_photo_reducer";
+import RemoveAiProxyUrlReducer from "./remove_ai_proxy_url_reducer";
 
 // Import all procedure arg schemas
+import * as GuestCallAiModelProcedure from "./guest_call_ai_model_procedure";
+import * as UserCallAiModelProcedure from "./user_call_ai_model_procedure";
 
 // Import all table schema definitions
 import ClassSessionsRow from "./class_sessions_table";
 import ClassSessionsUploadsRow from "./class_sessions_uploads_table";
 import GetUserProfileRow from "./get_user_profile_table";
 import PlantTypesRow from "./plant_types_table";
-import UploadRecordsRow from "./upload_records_table";
+import UserRow from "./user_table";
+import UserUploadsRow from "./user_uploads_table";
 
 /** Type-only namespace exports for generated type groups. */
 
@@ -80,13 +84,24 @@ const tablesSchema = __schema({
       { name: 'plant_types_name_key', constraint: 'unique', columns: ['name'] },
     ],
   }, PlantTypesRow),
-  upload_records: __table({
-    name: 'upload_records',
+  user: __table({
+    name: 'user',
+    indexes: [
+      { name: 'id', algorithm: 'btree', columns: [
+        'id',
+      ] },
+    ],
+    constraints: [
+      { name: 'user_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, UserRow),
+  user_uploads: __table({
+    name: 'user_uploads',
     indexes: [
     ],
     constraints: [
     ],
-  }, UploadRecordsRow),
+  }, UserUploadsRow),
   get_user_profile: __table({
     name: 'my_profile',
     indexes: [
@@ -99,13 +114,16 @@ const tablesSchema = __schema({
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
   __reducerSchema("activate_admin", ActivateAdminReducer),
+  __reducerSchema("add_ai_proxy_url", AddAiProxyUrlReducer),
   __reducerSchema("create_class_session", CreateClassSessionReducer),
   __reducerSchema("create_new_user", CreateNewUserReducer),
-  __reducerSchema("upload_plant_photo", UploadPlantPhotoReducer),
+  __reducerSchema("remove_ai_proxy_url", RemoveAiProxyUrlReducer),
 );
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */
 const proceduresSchema = __procedures(
+  __procedureSchema("guest_call_ai_model", GuestCallAiModelProcedure.params, GuestCallAiModelProcedure.returnType),
+  __procedureSchema("user_call_ai_model", UserCallAiModelProcedure.params, UserCallAiModelProcedure.returnType),
 );
 
 /** The remote SpacetimeDB module schema, both runtime and type information. */

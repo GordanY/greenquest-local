@@ -16,6 +16,11 @@ export const AdminActivateKey = __t.object("AdminActivateKey", {
 });
 export type AdminActivateKey = __Infer<typeof AdminActivateKey>;
 
+export const AiProxyUrl = __t.object("AiProxyUrl", {
+  url: __t.string(),
+});
+export type AiProxyUrl = __Infer<typeof AiProxyUrl>;
+
 export const ClassSessions = __t.object("ClassSessions", {
   accessCode: __t.string(),
   creatorId: __t.identity(),
@@ -28,13 +33,25 @@ export const ClassSessionsUploads = __t.object("ClassSessionsUploads", {
   accessCode: __t.string(),
   creatorNickname: __t.string(),
   mimeType: __t.string(),
-  photoBlob: __t.byteArray(),
+  photoBlob: __t.string(),
   plantAnswerType: __t.string(),
+  reason: __t.string(),
   plantCorrectName: __t.string(),
+  plantCorrectScientificName: __t.string(),
   plantCorrectType: __t.string(),
+  plantCorrectFunFact: __t.string(),
   timestamp: __t.f64(),
 });
 export type ClassSessionsUploads = __Infer<typeof ClassSessionsUploads>;
+
+export const Data = __t.object("Data", {
+  isPlant: __t.bool(),
+  plantCorrectName: __t.string(),
+  plantCorrectScientificName: __t.string(),
+  plantCorrectType: __t.string(),
+  plantCorrectFunFact: __t.string(),
+});
+export type Data = __Infer<typeof Data>;
 
 export const GetUserProfile = __t.object("GetUserProfile", {});
 export type GetUserProfile = __Infer<typeof GetUserProfile>;
@@ -47,16 +64,6 @@ export const PlantTypes = __t.object("PlantTypes", {
   icons: __t.string(),
 });
 export type PlantTypes = __Infer<typeof PlantTypes>;
-
-export const UploadRecords = __t.object("UploadRecords", {
-  userId: __t.identity(),
-  mimeType: __t.string(),
-  photoBlob: __t.byteArray(),
-  plantName: __t.string(),
-  plantType: __t.string(),
-  timestamp: __t.f64(),
-});
-export type UploadRecords = __Infer<typeof UploadRecords>;
 
 export const User = __t.object("User", {
   id: __t.identity(),
@@ -74,4 +81,18 @@ export const UserProfile = __t.object("UserProfile", {
   petName: __t.string(),
 });
 export type UserProfile = __Infer<typeof UserProfile>;
+
+export const UserUploads = __t.object("UserUploads", {
+  userId: __t.identity(),
+  mimeType: __t.string(),
+  photoBlob: __t.string(),
+  plantAnswerType: __t.string(),
+  reason: __t.string(),
+  plantCorrectName: __t.string(),
+  plantCorrectScientificName: __t.string(),
+  plantCorrectType: __t.string(),
+  plantCorrectFunFact: __t.string(),
+  timestamp: __t.f64(),
+});
+export type UserUploads = __Infer<typeof UserUploads>;
 

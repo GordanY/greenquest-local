@@ -10,11 +10,6 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-export default __t.row({
-  userId: __t.identity().name("user_id"),
-  mimeType: __t.string().name("mime_type"),
-  photoBlob: __t.byteArray().name("photo_blob"),
-  plantName: __t.string().name("plant_name"),
-  plantType: __t.string().name("plant_type"),
-  timestamp: __t.f64(),
-});
+export default {
+  proxyUrl: __t.string(),
+};

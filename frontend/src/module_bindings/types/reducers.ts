@@ -7,12 +7,14 @@ import { type Infer as __Infer } from "spacetimedb";
 
 // Import all reducer arg schemas
 import ActivateAdminReducer from "../activate_admin_reducer";
+import AddAiProxyUrlReducer from "../add_ai_proxy_url_reducer";
 import CreateClassSessionReducer from "../create_class_session_reducer";
 import CreateNewUserReducer from "../create_new_user_reducer";
-import UploadPlantPhotoReducer from "../upload_plant_photo_reducer";
+import RemoveAiProxyUrlReducer from "../remove_ai_proxy_url_reducer";
 
 export type ActivateAdminParams = __Infer<typeof ActivateAdminReducer>;
+export type AddAiProxyUrlParams = __Infer<typeof AddAiProxyUrlReducer>;
 export type CreateClassSessionParams = __Infer<typeof CreateClassSessionReducer>;
 export type CreateNewUserParams = __Infer<typeof CreateNewUserReducer>;
-export type UploadPlantPhotoParams = __Infer<typeof UploadPlantPhotoReducer>;
+export type RemoveAiProxyUrlParams = __Infer<typeof RemoveAiProxyUrlReducer>;
 

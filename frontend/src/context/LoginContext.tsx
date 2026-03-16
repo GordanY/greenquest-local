@@ -1,15 +1,15 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useModeContext } from "./ModeContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { SpacetimeDBProvider } from "spacetimedb/react";
 import { DbConnectionBuilder, DbConnection } from "../module_bindings";
 import { HOST, DB_NAME } from "../configs/configs";
 
-interface LoginContextType {
-  // Context intentionally empty - used as provider for SpacetimeDB connection
-}
+// interface LoginContextType {
+//   // Context intentionally empty - used as provider for SpacetimeDB connection
+// }
 
-const LoginContext = createContext<LoginContextType | undefined>(undefined);
+// const LoginContext = createContext<LoginContextType | undefined>(undefined);
 
 
 function getConnectionBuilder(mode: string, authToken: string | undefined, persistFunc: (token: string) => void): DbConnectionBuilder | undefined {
@@ -78,10 +78,10 @@ export function LoginContextProvider({ children }: { children: React.ReactNode }
   );
 }
 
-export function useLoginContext() {
-  const context = useContext(LoginContext);
-  if (!context) {
-    throw new Error('useLoginContext must be used within LoginContextProvider');
-  }
-  return context;
-}
+// export function useLoginContext() {
+//   const context = useContext(LoginContext);
+//   if (!context) {
+//     throw new Error('useLoginContext must be used within LoginContextProvider');
+//   }
+//   return context;
+// }

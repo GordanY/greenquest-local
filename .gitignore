@@ -1,4 +1,6 @@
 original/**
 frontend/node_modules/**
 backend/spacetimedb/node_modules/**
+backend/spacetimedb/dist/**
 .claude/**
+README_private.md

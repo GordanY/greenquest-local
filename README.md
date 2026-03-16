@@ -1,1 +1,0 @@
-spacetime sql --server local greenquest-db "SELECT * FROM user" 
