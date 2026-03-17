@@ -17,13 +17,34 @@ export function GuestChallengeQuestionCard({
   plantTypes,
   questionId,
   setQuestionId,
-  setPage
+  setPage,
+  classSessionUploads,
+  accessCode,
+  nickname
 }: {
   plantTypes: any;
   questionId: number;
   setQuestionId: (id: number) => void;
   setPage: (page: string) => void;
+  classSessionUploads: readonly any[];
+  accessCode: string;
+  nickname: string;
 }) {
+  const currentPlantType = plantTypes[questionId]?.name;
+
+  // Check if already answered
+  const hasAnswered = classSessionUploads.some(upload =>
+    upload.accessCode === accessCode &&
+    upload.creatorNickname === nickname &&
+    upload.plantAnswerType === currentPlantType
+  );
+
+  const handleSkip = () => {
+    if (questionId < plantTypes.length - 1) {
+      setQuestionId(questionId + 1);
+    }
+  };
+
   return (
     <div className="guest-challenge-question-screen">
       <div className="guest-challenge-title">植物挑戰</div>
@@ -33,18 +54,22 @@ export function GuestChallengeQuestionCard({
         <div className="guest-current-challenge-label">當前挑戰</div>
         <div className="guest-plant-type-title">{plantTypes[questionId]?.name}</div>
         <p className="guest-plant-description">{plantTypes[questionId]?.description}</p>
+        {hasAnswered && <div className="already-answered-badge">✓ 已回答</div>}
       </div>
 
       <div className="guest-challenge-actions">
         <button
           className="btn btn-primary guest-challenge-btn"
           onClick={() => setPage('photo')}
+          disabled={hasAnswered}
+          title={hasAnswered ? '已經回答過此題' : ''}
         >
           📷 拍照
         </button>
         <button
           className="btn btn-secondary guest-challenge-btn"
-          onClick={() => setQuestionId(Math.floor(Math.random() * plantTypes.length))}
+          onClick={handleSkip}
+          disabled={questionId === plantTypes.length - 1}
         >
           跳過
         </button>
@@ -288,7 +313,8 @@ export function GuestChallengeAnswer({
   photoBlob: string | undefined;
   setPage: (page: string) => void;
 }) {
-  const { isPlant, plantName, scientificName, funFact } = aiResponse;
+  const { isPlant, plantCorrectName, plantCorrectScientificName, plantCorrectType, plantCorrectFunFact } = aiResponse;
+  const correct = plantTypes[questionId]?.name === plantCorrectType;
 
   if (!isPlant) {
     return (
@@ -303,41 +329,53 @@ export function GuestChallengeAnswer({
 
   return (
     <div className="result-screen">
-      <h2 className="result-page-title">挑戰結果</h2>
+      {/* <h2 className="result-page-title">挑戰結果</h2> */}
 
       <img src={photoBlob} alt="植物圖片" className="result-image" />
 
-      <div className="result-status">
-        <div className="result-emoji">🎉</div>
-        <div className="result-status-title">已分析</div>
-        <p className="result-xp-text">AI 已識別該植物</p>
-      </div>
+      {correct ? (
+        <div className="result-status result-status-correct">
+          <div className="result-emoji">🎉</div>
+          <div className="result-status-title">答對了！</div>
+        </div>
+      ) : (
+        <div className="result-status result-status-incorrect">
+          <div className="result-emoji">🤔</div>
+          <div className="result-status-title">答錯了！</div>
+        </div>
+      )}
 
-      {plantName && (
+      {plantCorrectName && (
         <div className="result-plant-info">
-          <p className="plant-info-name">{plantName}</p>
-          {scientificName && (
-            <p className="plant-info-scientific">{scientificName}</p>
+          <p className="plant-info-name">{plantCorrectName}</p>
+          {plantCorrectScientificName && (
+            <p className="plant-info-scientific">{plantCorrectScientificName}</p>
           )}
-          {funFact && (
-            <p className="plant-info-funfact">{funFact}</p>
+          {plantCorrectFunFact && (
+            <p className="plant-info-funfact">{plantCorrectFunFact}</p>
           )}
         </div>
       )}
 
       <div className="hint-box">
-        <p className="hint-title">💡 延伸知識</p>
-        <p className="hint-content">{plantTypes[questionId]?.extras}</p>
+        <p className="hint-title">{correct ? '💡 延伸知識' : '💡 提示'}</p>
+        <p className="hint-content">{correct ? plantTypes[questionId]?.extras : plantTypes[questionId]?.hints}</p>
       </div>
 
-      <button className="btn btn-primary result-continue-btn" onClick={() => { setPage('question'); }}>下一題 →</button>
+      <button className="btn btn-primary result-continue-btn" onClick={() => { setPage('question'); }}>{'下一題 →'}</button>
     </div>
   );
 }
 
-export function GuestChallenge() {
+export function GuestChallenge({
+  questionId,
+  setQuestionId
+}: {
+  questionId: number;
+  setQuestionId: (id: number) => void;
+}) {
   const [plantTypes, questionReady] = useTable(tables.plant_types);
-  const [questionId, setQuestionId] = useState(0);
+  const [classSessionUploads] = useTable(tables.class_sessions_uploads);
   const [page, setPage] = useState('question'); // question / photo / loading answer / answer
   const [photoBlob, setPhotoBlob] = useState<string | undefined>(undefined);
   const [reason, setReason] = useState<string | undefined>(undefined);
@@ -353,6 +391,9 @@ export function GuestChallenge() {
         questionId={questionId}
         setQuestionId={setQuestionId}
         setPage={setPage}
+        classSessionUploads={classSessionUploads}
+        accessCode={accessCode}
+        nickname={nickname}
       />
     );
   } else if (page === 'photo') {

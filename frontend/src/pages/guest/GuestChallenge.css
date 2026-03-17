@@ -81,6 +81,16 @@
   max-width: 95%;
 }
 
+.already-answered-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #16a34a;
+  background-color: #dcfce7;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .guest-challenge-actions {
   display: flex;
   gap: 0.75rem;
@@ -273,8 +283,17 @@
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
-  border: 2px solid #10b981;
+  border: 2px solid;
+}
+
+.result-status-correct {
   background-color: #ecfdf5;
+  border-color: #10b981;
+}
+
+.result-status-incorrect {
+  background-color: #fef3c7;
+  border-color: #fbbf24;
 }
 
 .result-emoji {
@@ -286,9 +305,16 @@
 .result-status-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #059669;
   margin: 0;
   margin-bottom: 0.25rem;
+}
+
+.result-status-correct .result-status-title {
+  color: #059669;
+}
+
+.result-status-incorrect .result-status-title {
+  color: #b45309;
 }
 
 .result-xp-text {

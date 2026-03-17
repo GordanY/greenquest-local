@@ -311,7 +311,7 @@ export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photo
         <p className="hint-content">{correct ? plant_types[questionId].extras : plant_types[questionId].hints}</p>
       </div>
 
-      <button className="btn btn-primary result-continue-btn" onClick={()=>{setPage('question')}}>{correct ? '下一題 →' : '再試一次 →'}</button>
+      <button className="btn btn-primary result-continue-btn" onClick={()=>{setPage('question')}}>{correct ? '下一題 →' : '下一題 →'}</button>
     </div>
   );
 }
