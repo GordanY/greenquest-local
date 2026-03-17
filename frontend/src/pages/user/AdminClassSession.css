@@ -151,6 +151,15 @@
   border-bottom: none;
 }
 
+.table-row.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.table-row.clickable:hover {
+  background-color: #f9fafb;
+}
+
 .col {
   display: flex;
   align-items: center;

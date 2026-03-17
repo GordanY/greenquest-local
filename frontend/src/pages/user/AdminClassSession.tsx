@@ -3,10 +3,17 @@ import { useTable, useSpacetimeDB } from 'spacetimedb/react';
 import { tables } from '../../module_bindings';
 import './AdminClassSession.css';
 
-export function AdminClassSession({ accessCode, onBack }: { accessCode: string; onBack: () => void }) {
+export function AdminClassSession({
+  accessCode,
+  onBack,
+  onSelectPlant
+}: {
+  accessCode: string;
+  onBack: () => void;
+  onSelectPlant: (plantType: string) => void;
+}) {
   const [classSessionUploads, uploadsReady] = useTable(tables.class_sessions_uploads);
   const [sessions] = useTable(tables.class_sessions);
-  const [activeTab, setActiveTab] = useState<'active' | 'expired'>('active');
   const [contentReady, setContentReady] = useState(false);
   const [remainingTime, setRemainingTime] = useState<string>('00:00:00');
 
@@ -59,14 +66,10 @@ export function AdminClassSession({ accessCode, onBack }: { accessCode: string; 
     }
   });
 
-  const activeStats = Array.from(plantStats.entries()).map(([plant, stats]) => ({
+  const displayedStats = Array.from(plantStats.entries()).map(([plant, stats]) => ({
     plant,
     ...stats
   }));
-
-  const expiredStats = [...activeStats]; // For demo, same data
-
-  const displayedStats = activeTab === 'active' ? activeStats : expiredStats;
 
   if (!contentReady || !currentSession) {
     return (
@@ -95,20 +98,6 @@ export function AdminClassSession({ accessCode, onBack }: { accessCode: string; 
         </div>
       </div>
 
-      <div className="tabs-section">
-        <button
-          className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
-          onClick={() => setActiveTab('active')}
-        >
-          進行中
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'expired' ? 'active' : ''}`}
-          onClick={() => setActiveTab('expired')}
-        >
-          已過期
-        </button>
-      </div>
 
       <div className="stats-list">
         {displayedStats.length === 0 ? (
@@ -123,7 +112,11 @@ export function AdminClassSession({ accessCode, onBack }: { accessCode: string; 
               <div className="col col-incorrect">✕ 錯誤</div>
             </div>
             {displayedStats.map(stat => (
-              <div key={stat.plant} className="table-row">
+              <div
+                key={stat.plant}
+                className="table-row clickable"
+                onClick={() => onSelectPlant(stat.plant)}
+              >
                 <div className="col col-plant">{stat.plant}</div>
                 <div className="col col-correct">
                   <span className="stat-badge correct">{stat.correct}</span>

@@ -9,6 +9,8 @@ import { UserShop } from './UserShop';
 import { UserChallenge } from './UserChallenge';
 import { UserRanking } from './UserRanking';
 import { AdminClassSessionManage } from './AdminClassSessionManage';
+import { AdminClassSession } from './AdminClassSession';
+import { AdminClassSessionResult } from './AdminClassSessionResult';
 import './UserHome.css';
 
 export default function UserHome() {
@@ -21,6 +23,9 @@ export default function UserHome() {
   const [petName, setPetName] = useState('種籽');
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminPasscode, setAdminPasscode] = useState('');
+  const [adminSubPage, setAdminSubPage] = useState<'manage' | 'session' | 'result'>('manage');
+  const [selectedSessionCode, setSelectedSessionCode] = useState('');
+  const [selectedPlantType, setSelectedPlantType] = useState('');
   const createNewUser = useReducer(reducers.createNewUser);
   const activateAdmin = useReducer(reducers.activateAdmin);
   const { getConnection } = useSpacetimeDB();
@@ -138,7 +143,35 @@ export default function UserHome() {
             {page === 'ranking' && <UserRanking />}
             {page === 'shop' && <UserShop />}
             {page === 'pokedex' && <UserPokedex />}
-            {page === 'admin' && <AdminClassSessionManage />}
+            {page === 'admin' && (
+              <>
+                {adminSubPage === 'manage' && (
+                  <AdminClassSessionManage
+                    onSelectSession={(code) => {
+                      setSelectedSessionCode(code);
+                      setAdminSubPage('session');
+                    }}
+                  />
+                )}
+                {adminSubPage === 'session' && (
+                  <AdminClassSession
+                    accessCode={selectedSessionCode}
+                    onBack={() => setAdminSubPage('manage')}
+                    onSelectPlant={(plant) => {
+                      setSelectedPlantType(plant);
+                      setAdminSubPage('result');
+                    }}
+                  />
+                )}
+                {adminSubPage === 'result' && (
+                  <AdminClassSessionResult
+                    accessCode={selectedSessionCode}
+                    plantType={selectedPlantType}
+                    onBack={() => setAdminSubPage('session')}
+                  />
+                )}
+              </>
+            )}
           </div>
 
           <nav className="nav-bar">
@@ -182,7 +215,10 @@ export default function UserHome() {
             {myUser?.role === 'admin' && (
               <button
                 className={`nav-button ${page === 'admin' ? 'active' : ''}`}
-                onClick={() => setPage('admin')}
+                onClick={() => {
+                  setPage('admin');
+                  setAdminSubPage('manage');
+                }}
               >
                 <span style={{ fontSize: '1.5rem' }}>🏫</span>
                 <span className="nav-label">課室</span>

@@ -15,7 +15,7 @@ const DURATION_OPTIONS = [
   { value: 60, label: '60分鐘' }
 ];
 
-export function AdminClassSessionManage() {
+export function AdminClassSessionManage({ onSelectSession }: { onSelectSession: (accessCode: string) => void }) {
   const [sessions, sessionsReady] = useTable(tables.class_sessions);
   const [duration, setDuration] = useState(15);
   const [activeTab, setActiveTab] = useState<'active' | 'expired'>('active');
@@ -110,7 +110,11 @@ export function AdminClassSessionManage() {
           </div>
         ) : (
           displayedSessions.map(session => (
-            <div key={session.accessCode} className="session-card">
+            <div
+              key={session.accessCode}
+              className="session-card clickable"
+              onClick={() => onSelectSession(session.accessCode)}
+            >
               <div className="session-header">
                 <span className="session-code">課程碼: {session.accessCode}</span>
                 <span className={`session-status ${activeTab === 'active' ? 'active' : 'expired'}`}>

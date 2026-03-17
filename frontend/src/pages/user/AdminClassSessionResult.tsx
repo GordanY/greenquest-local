@@ -16,7 +16,7 @@ export function AdminClassSessionResult({
   accessCode: string;
   plantType: string;
   onBack: () => void;
-}) {
+}): JSX.Element {
   const [classSessionUploads] = useTable(tables.class_sessions_uploads);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
