@@ -513,7 +513,9 @@ export const get_plant_detail = spacetimedb.procedure(
       });
       console.log(`Response status: ${response.status}`);
     } catch (err) {
-      throw new SenderError(`Error in http fetch: (res: ${JSON.stringify(response)}) ${String(err)}`);
+      const errorMsg = String(err);
+      console.error(`Error in http fetch to proxy_url: ${proxy_url}, error: ${errorMsg}`);
+      throw new SenderError(`Error in http fetch: ${errorMsg}`);
     }
 
     if (response.status !== 200) {
@@ -523,8 +525,14 @@ export const get_plant_detail = spacetimedb.procedure(
     const data = response.json();
     const aiResponse = JSON.parse(data.candidates[0].content.parts[0].text);
 
+    console.log(`Raw AI response: ${JSON.stringify(aiResponse)}`);
+
     if (!aiResponse) {
       throw new SenderError(`Failed to parse AI response`);
+    }
+
+    if (!aiResponse.flowerLanguage && !aiResponse.bloomingSeason && !aiResponse.description) {
+      console.error(`AI response has empty fields: ${JSON.stringify(aiResponse)}`);
     }
 
     return {

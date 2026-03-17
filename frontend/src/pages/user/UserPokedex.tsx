@@ -11,10 +11,6 @@ interface Plant {
     fact: string;
 }
 
-export function UserPokedexSpecificName(_: { plantName: string }) {
-    // Component for displaying a specific plant detail view
-}
-
 export function UserPokedex() {
     const { getConnection } = useSpacetimeDB();
     const [uploads, uploadsReady] = useTable(tables.user_uploads);
@@ -62,13 +58,14 @@ export function UserPokedex() {
             });
 
             if (response) {
-                setDetailData({
-                    flowerLanguage: response.flower_language,
-                    bloomingSeason: response.blooming_season,
-                    description: response.description
-                });
+                console.log('取得植物詳細資訊成功:', response);
+                setDetailData(response);
+                setLoading(false);
+            } else {
+                console.error('取得植物詳細資訊失敗: 無回應');
+                setDetailData(null);
+                setLoading(false);
             }
-            setLoading(false);
         } catch (error) {
             console.error('取得植物詳細資訊失敗:', error);
             setLoading(false);

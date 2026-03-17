@@ -59,29 +59,36 @@
 /* ========== PLANT DETAIL MODAL ========== */
 .plant-detail-modal {
     position: fixed;
-    inset: 0;
-    background-color: rgba(255, 255, 255, 0.9);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--screen-width);
+    height: var(--screen-height);
+    max-height: 95vh;
+    background-color: white;
+    border-radius: var(--screen-border-radius);
+    box-shadow: var(--screen-shadow);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
     z-index: 50;
+    overflow: hidden;
 }
 
 .plant-detail-modal-content {
     background-color: #ffffff;
-    border-radius: 0.5rem;
-    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
-    max-width: 42rem;
+    border-radius: 0;
+    box-shadow: none;
     width: 100%;
-    margin: 1rem;
-    max-height: 90vh;
+    height: 100%;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .plant-detail-modal-body {
     padding: 1.5rem;
     text-align: left;
-    max-height: 70vh;
+    flex: 1;
     overflow-y: auto;
 }
 
@@ -105,6 +112,7 @@
     color: #9ca3af;
     font-style: italic;
     margin-bottom: 1rem;
+    text-align: center;
 }
 
 .plant-detail-section {
@@ -199,8 +207,15 @@
 /* ========== LOADING STATE ========== */
 .plant-detail-loading {
     position: fixed;
-    inset: 0;
-    background-color: rgba(255, 255, 255, 0.9);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--screen-width);
+    height: var(--screen-height);
+    max-height: 95vh;
+    background-color: white;
+    border-radius: var(--screen-border-radius);
+    box-shadow: var(--screen-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -209,6 +224,7 @@
 
 .loading-container {
     text-align: center;
+    padding: 1rem;
 }
 
 .loading-emoji {
@@ -254,8 +270,15 @@
 /* ========== ERROR STATE ========== */
 .plant-detail-error {
     position: fixed;
-    inset: 0;
-    background-color: rgba(255, 255, 255, 0.9);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--screen-width);
+    height: var(--screen-height);
+    max-height: 95vh;
+    background-color: white;
+    border-radius: var(--screen-border-radius);
+    box-shadow: var(--screen-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -264,6 +287,7 @@
 
 .error-container {
     text-align: center;
+    padding: 1rem;
 }
 
 .error-emoji {
