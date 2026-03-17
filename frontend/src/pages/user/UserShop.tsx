@@ -51,7 +51,7 @@ export function UserShop(){
 
     return (
         <div className="shop-container">
-            <h1 className="shop-title">寵物商店</h1>
+            <h1 className="page-title">寵物商店</h1>
 
             <div className="shop-balance">
                 <div className="balance-label">你的種子</div>

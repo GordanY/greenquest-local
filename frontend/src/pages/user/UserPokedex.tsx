@@ -186,8 +186,8 @@ export function UserPokedex() {
     }
 
     return (
-        <div>
-            <h2 className="pokedex-title">植物圖鑑</h2>
+        <div className="pokedex-container">
+            <h2 className="page-title">植物圖鑑</h2>
             <div className="pokedex-grid">
                 {Object.keys(pokedex).length === 0 ? (
                     <p className="pokedex-empty">

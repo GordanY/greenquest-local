@@ -4,18 +4,20 @@ import { useTable } from 'spacetimedb/react';
 import './UserPet.css';
 
 export function xpToLevel(xp: number) {
-    const x = Math.ceil(xp / 2);
-    return (x === 0) ? 1 : x;
+    // Find highest n where (4+n)*n <= xp, then level = n+1
+    // Solve: n^2 + 4n - xp = 0
+    // n = (-4 + sqrt(16 + 4*xp)) / 2
+    const n = Math.floor((-4 + Math.sqrt(16 + 4 * xp)) / 2);
+    return Math.max(1, n + 1);
 }
 
 export function xpToNextLevel(level: number) {
-    return 2*level+1;
+    // Total XP needed to reach level+1 from level 1 = (4+level)*level
+    return (4 + level) * level;
 }
 
 export function levelToPetStage(level: number) {
-    return (level >= 1) ?
-        1 :
-        ((level >= 2) ? 2 : 3);
+    return (level >= 3) ? 3 : ((level >= 2) ? 2 : 1);
 }
 
 interface UserPetProps {

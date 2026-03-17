@@ -1,6 +1,8 @@
 import { useTable } from 'spacetimedb/react';
 import { tables } from '../../module_bindings';
 import { createContext, useContext, useState } from 'react';
+import { useModeContext } from '../../context/ModeContext';
+import './GuestProfileForm.css';
 
 export interface GuestProfile {
     accessCode: string;
@@ -11,6 +13,7 @@ export const GuestProfileContext = createContext<GuestProfile | undefined>(undef
 
 export default function GuestProfileProvider({children}: {children: React.ReactNode}) {
     // const { identity, token } = useSpacetimeDB();
+    const { setMode } = useModeContext();
     const [class_sessions] = useTable(tables.class_sessions);
     const [accessCode, setAccessCode] = useState(()=>{
         return sessionStorage.getItem('guest_access_code') || '';
@@ -44,7 +47,7 @@ export default function GuestProfileProvider({children}: {children: React.ReactN
                 return setReady(true);
             }
         }
-        alert('invalid access or nickname');
+        alert('課程碼或暱稱無效。請檢查並重試。');
         return setReady(false);
     }
 
@@ -56,45 +59,55 @@ export default function GuestProfileProvider({children}: {children: React.ReactN
     return (
         <GuestProfileContext.Provider value={contextValue}>
             {ready && children}
-            {!ready && (<form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    maxLength={6}
-                    value={accessCode}
-                    onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                    placeholder="Enter 6-digit code"
-                    style={{
-                        padding: '8px',
-                        fontSize: '16px',
-                        marginRight: '10px',
-                        width: '200px',
-                    }}
-                />
-                <input
-                    type="text"
-                    maxLength={6}
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                    placeholder="Enter nickname"
-                    style={{
-                        padding: '8px',
-                        fontSize: '16px',
-                        marginRight: '10px',
-                        width: '200px',
-                    }}
-                />
-                <button
-                    type="submit"
-                    disabled={accessCode.length !== 6 || nickname.length === 0}
-                    style={{
-                        padding: '8px 16px',
-                        fontSize: '16px',
-                        cursor: accessCode.length === 6 ? 'pointer' : 'not-allowed',
-                    }}
-                >
-                    Join
-                </button>
-            </form>)}
+            {!ready && (
+                <div className="guest-profile-container screen-base">
+                    <div className="guest-profile-card">
+                        <button
+                            className="back-button"
+                            onClick={() => setMode('')}
+                            type="button"
+                            aria-label="返回"
+                        >
+                            ←
+                        </button>
+                        <h1 className="guest-profile-title">加入課程</h1>
+                        <p className="guest-profile-subtitle">請輸入課程碼和暱稱</p>
+                        <form className="guest-form" onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label className="form-label">課程碼</label>
+                                <input
+                                    className="form-input access-code-input"
+                                    type="text"
+                                    maxLength={6}
+                                    value={accessCode}
+                                    onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
+                                    placeholder="A1B2C3"
+                                />
+                                <span className="form-hint">6 個大寫字母或數字</span>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">暱稱</label>
+                                <input
+                                    className="form-input"
+                                    type="text"
+                                    maxLength={20}
+                                    value={nickname}
+                                    onChange={(e) => setNickname(e.target.value)}
+                                    placeholder="輸入你的暱稱"
+                                />
+                                <span className="form-hint">最多 20 個字符</span>
+                            </div>
+                            <button
+                                className="submit-btn"
+                                type="submit"
+                                disabled={accessCode.length !== 6 || nickname.length === 0}
+                            >
+                                加入課程
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </GuestProfileContext.Provider>
     );
 }

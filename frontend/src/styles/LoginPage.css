@@ -1,6 +1,90 @@
-/* App.css */
+/* LoginPage.css */
 * {
   box-sizing: border-box;
+}
+
+/* Login Screen */
+.login-container {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.login-container.screen-base {
+  /* Extends screen-base */
+}
+
+.login-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+  width: 100%;
+  text-align: center;
+}
+
+.login-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #10b981;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.025em;
+}
+
+.login-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 2rem 0;
+  font-weight: 500;
+}
+
+.login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.login-btn {
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Noto Sans TC', inherit;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.login-btn-user {
+  background-color: #10b981;
+  color: white;
+}
+
+.login-btn-user:hover {
+  background-color: #059669;
+}
+
+.login-btn-guest {
+  background-color: #d1d5db;
+  color: #374151;
+}
+
+.login-btn-guest:hover {
+  background-color: #b3b8c2;
 }
 
 .app-container {

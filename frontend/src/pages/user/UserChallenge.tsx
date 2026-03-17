@@ -15,7 +15,7 @@ export function UserLoadingQuestion() {
 export function UserChallengeQuestionCard({ plant_types, questionId, setQuestionId, setPage }: { plant_types: any, questionId: number, setQuestionId: any, setPage: any }) {
   return (
     <div className="challenge-question-screen">
-      <div className="challenge-title">植物挑戰</div>
+      <div className="page-title">植物挑戰</div>
 
       <div className="challenge-question-card">
         <div className="plant-icon-large">{plant_types[questionId]?.icons}</div>
@@ -231,8 +231,11 @@ export function UserChallengeLoadingAnswer({ plantAnswerType, reason, photoBlob,
         console.log('AI response received:', response);
         if (response) {
           setAIResponse(response);
+          setPage('answer');
+        } else {
+          alert('Failed to get AI response. Please try again.');
+          setPage('question');
         }
-        setPage('answer')
       })
         .catch(err => {
           console.error(`error when calling AI:`, err);

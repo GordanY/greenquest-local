@@ -4,6 +4,7 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import { ModeContextProvider } from './context/ModeContext';
 import { LoginContextProvider } from './context/LoginContext';
 import { HomePage } from './pages/HomePage';
+import './styles/ScreenBase.css';
 
 
 

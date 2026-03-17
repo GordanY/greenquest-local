@@ -1,0 +1,55 @@
+/* ========== UNIFIED SCREEN SIZING ========== */
+/* iPhone 16 Aspect Ratio: 393px × 852px */
+/* Scaled up for better viewing on desktop: 420px × 912px (2.17 aspect ratio) */
+
+:root {
+  --screen-width: 420px;
+  --screen-height: 912px;
+  --screen-border-radius: 1rem;
+  --screen-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Base screen container - use this class for all screens */
+.screen-base {
+  width: 100%;
+  max-width: var(--screen-width);
+  height: var(--screen-height);
+  max-height: 95vh;
+  margin: 0 auto;
+  border-radius: var(--screen-border-radius);
+  box-shadow: var(--screen-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+}
+
+/* Body styling for all pages */
+body {
+  background-color: #f3f4f6;
+  margin: 0;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Root container */
+#root {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========== UNIFIED PAGE HEADER ========== */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #10b981;
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+  padding: 0 1rem;
+  letter-spacing: -0.025em;
+}

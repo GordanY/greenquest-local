@@ -34,14 +34,6 @@
   overflow: hidden;
 }
 
-.challenge-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #059669;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
 
 /* ========== CHALLENGE QUESTION CARD ========== */
 .challenge-question-card {

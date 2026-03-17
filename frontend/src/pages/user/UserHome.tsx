@@ -30,7 +30,7 @@ export default function UserHome() {
   const activateAdmin = useReducer(reducers.activateAdmin);
   const { getConnection } = useSpacetimeDB();
   const conn = getConnection();
-  const myUser = users.find(u => u.id.equals(conn?.identity));
+  const myUser = users.find(u => u.id.equals(conn.identity));
 
   useEffect(()=>{
     // Initialize when both profile is ready and data is populated
@@ -49,8 +49,6 @@ export default function UserHome() {
       name: user?.name,
       petType: selectedPet,
       petName: petName
-    }).then(() => {
-      setUserInited(true);
     }).catch(err => {
       console.log(`error when createNewUser: ${err}`);
     });
@@ -75,10 +73,15 @@ export default function UserHome() {
   }
 
   const profile = my_profile[0];
-  const level = xpToLevel(profile?.experiencePoints || 0);
-  const nextLevelXp = xpToNextLevel(level + 1);
-  const xp = (profile?.experiencePoints || 0) % nextLevelXp;
-  const xpPercentage = ((xp / nextLevelXp) * 100);
+  const currentXp = profile?.experiencePoints || 0;
+  const level = xpToLevel(currentXp);
+
+  // Calculate XP progress within current level
+  const totalXpToCurrentLevel = (4 + (level - 1)) * (level - 1);
+  const totalXpToNextLevel = (4 + level) * level;
+  const xpInCurrentLevel = currentXp - totalXpToCurrentLevel;
+  const xpNeededForNextLevel = totalXpToNextLevel - totalXpToCurrentLevel;
+  const xpPercentage = ((xpInCurrentLevel / xpNeededForNextLevel) * 100);
   const seeds = profile?.seeds || 0;
 
   const petImage = useMemo<string>(() => {
@@ -94,8 +97,8 @@ export default function UserHome() {
   }, [profile]);
 
   return (
-    <div className="user-home-container">
-      {!profile_ready && (
+    <div className="user-home-container screen-base">
+      {!profile_ready && !userInited && (
         <div className="loading-overlay">
           <div className="loader"></div>
           <p className="loading-text">Loading...</p>
@@ -110,7 +113,7 @@ export default function UserHome() {
           onSubmit={handleUserInit}
         />
       )}
-      {profile_ready && userInited && (
+      {userInited && (
         <>
           <div className="screen-container">
             {page === 'home' && (
@@ -121,7 +124,7 @@ export default function UserHome() {
                     <div className="xp-bar-container">
                       <div className="xp-bar-fill" style={{ width: `${xpPercentage}%` }}></div>
                     </div>
-                    <span className="xp-text">{xp}/{nextLevelXp}</span>
+                    <span className="xp-text">{xpInCurrentLevel}/{xpNeededForNextLevel}</span>
                   </div>
                   <div className="header-buttons">
                     {/* <button className="icon-button">🏆</button> */}
@@ -188,28 +191,36 @@ export default function UserHome() {
               className={`nav-button ${page === 'challenge' ? 'active' : ''}`}
               onClick={() => setPage('challenge')}
             >
-              <span style={{ fontSize: '1.5rem' }}>📷</span>
+              <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
               <span className="nav-label">挑戰</span>
             </button>
             <button
               className={`nav-button ${page === 'ranking' ? 'active' : ''}`}
               onClick={() => setPage('ranking')}
             >
-              <span style={{ fontSize: '1.5rem' }}>🏅</span>
+              <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
               <span className="nav-label">排名</span>
             </button>
             <button
               className={`nav-button ${page === 'pokedex' ? 'active' : ''}`}
               onClick={() => setPage('pokedex')}
             >
-              <span style={{ fontSize: '1.5rem' }}>📕</span>
+              <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
               <span className="nav-label">圖鑒</span>
             </button>
             <button
               className={`nav-button ${page === 'shop' ? 'active' : ''}`}
               onClick={() => setPage('shop')}
             >
-              <span style={{ fontSize: '1.5rem' }}>🛍️</span>
+              <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
               <span className="nav-label">商店</span>
             </button>
             {myUser?.role === 'admin' && (
@@ -220,7 +231,9 @@ export default function UserHome() {
                   setAdminSubPage('manage');
                 }}
               >
-                <span style={{ fontSize: '1.5rem' }}>🏫</span>
+                <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 8.646 4 4 0 010-8.646M9 9H7a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2h-2" />
+                </svg>
                 <span className="nav-label">課室</span>
               </button>
             )}

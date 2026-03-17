@@ -65,7 +65,7 @@ export function UserRanking() {
 
     return (
         <div className="ranking-container">
-            <h2 className="ranking-title">競賽模式</h2>
+            <h2 className="page-title">競賽模式</h2>
             <p className="ranking-subtitle">{getMonthYearString()}</p>
 
             {topThree.length > 0 && (

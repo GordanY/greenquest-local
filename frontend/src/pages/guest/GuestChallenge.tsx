@@ -282,8 +282,11 @@ export function GuestChallengeLoadingAnswer({
           console.log('AI response received:', response);
           if (response) {
             setAIResponse(response);
+            setPage('answer');
+          } else {
+            alert('Failed to get AI response. Please try again.');
+            setPage('question');
           }
-          setPage('answer');
         })
         .catch(err => {
           console.error(`error when calling AI:`, err);

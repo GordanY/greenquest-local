@@ -1,16 +1,6 @@
 /* ========== GUEST HOME CONTAINER ========== */
 .guest-home-container {
-  width: 100%;
-  max-width: 448px;
-  margin: 0 auto;
-  height: 800px;
-  max-height: 90vh;
   background-color: white;
-  border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
 .screen-container {

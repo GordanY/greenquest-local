@@ -148,7 +148,7 @@ export default function GuestHome() {
   }
 
   return (
-    <div className="guest-home-container">
+    <div className="guest-home-container screen-base">
       <div className="screen-container">
         <GuestHomeScreen
           accessCode={accessCode}
