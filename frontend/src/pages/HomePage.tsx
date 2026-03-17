@@ -6,7 +6,7 @@ import UserHome from "./user/UserHome";
 export function HomePage(){
     const {mode}= useModeContext();
     return (
-        <div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
             {
                 mode === 'user' &&
                 <UserHome/>

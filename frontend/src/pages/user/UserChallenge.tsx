@@ -1,41 +1,44 @@
-import { useTable, useReducer, useSpacetimeDB } from "spacetimedb/react";
-import { tables, reducers } from "../../module_bindings";
+import { useTable, useSpacetimeDB } from "spacetimedb/react";
+import { tables } from "../../module_bindings";
 import { useState, useRef, useEffect } from "react";
+import './UserChallenge.css';
 
 export function UserLoadingQuestion() {
   return (
-    <div>
-      <div> 植物挑戰 </div>
-      <div>
-        <div> 加載中... </div>
-      </div>
+    <div className="challenge-loading">
+      <div className="loading-spinner"></div>
+      <p className="loading-text">加載中...</p>
     </div>
   );
 }
 
 export function UserChallengeQuestionCard({ plant_types, questionId, setQuestionId, setPage }: { plant_types: any, questionId: number, setQuestionId: any, setPage: any }) {
   return (
-    <div>
-      <div> 植物挑戰 </div>
-      <div>
-        <div> {plant_types[questionId]?.icons} </div>
-        <div> {plant_types[questionId]?.name} </div>
-        <div> {plant_types[questionId]?.description} </div>
+    <div className="challenge-question-screen">
+      <div className="challenge-title">植物挑戰</div>
+
+      <div className="challenge-question-card">
+        <div className="plant-icon-large">{plant_types[questionId]?.icons}</div>
+        <div className="current-challenge-label">當前挑戰</div>
+        <div className="plant-type-title">{plant_types[questionId]?.name}</div>
+        <p className="plant-description">{plant_types[questionId]?.description}</p>
       </div>
-      <div>
-        <div>
-          <div>答對獎勵</div>
-          <div>+5 XP</div>
+
+      <div className="challenge-rewards">
+        <div className="reward-correct">
+          <div className="reward-label-correct">答對獎勵</div>
+          <div className="reward-value-correct">+5 XP</div>
         </div>
-        <div>
-          <div>答錯獎勵</div>
-          <div>+1 XP</div>
+        <div className="reward-divider"></div>
+        <div className="reward-incorrect">
+          <div className="reward-label-incorrect">答錯獎勵</div>
+          <div className="reward-value-incorrect">+1 XP</div>
         </div>
       </div>
-      <div>
-        <button onClick={() => { setPage('photo') }}>📷 拍照</button>
-        <button onClick={() => { setQuestionId(Math.floor(Math.random() * plant_types.length)) }}>跳過</button>
-        {/* <button>🖼️ 相簿</button> */}
+
+      <div className="challenge-actions">
+        <button className="btn btn-primary challenge-btn" onClick={() => { setPage('photo') }}>📷 拍照</button>
+        <button className="btn btn-secondary challenge-btn" onClick={() => { setQuestionId(Math.floor(Math.random() * plant_types.length)) }}>跳過</button>
       </div>
     </div>
   );
@@ -46,6 +49,8 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [videoStream, setStream] = useState<MediaStream | null>(null);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [reasonText, setReasonText] = useState<string>('');
 
   useEffect(() => {
     const constraints = {
@@ -80,12 +85,35 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
 
         // Convert canvas to base64
         const base64 = canvasRef.current.toDataURL('image/jpeg', 0.6);
-        setPhotoBlob(base64);
-        // console.log(base64.substring(0,20));
+        setCapturedPhoto(base64);
         stopCamera();
-        setPage('loading answer');
       }
     }
+  }
+
+  const handleSubmitPhoto = () => {
+    setReason(reasonText.trim());
+    setPhotoBlob(capturedPhoto);
+    setPage('loading answer');
+  }
+
+  const handleCancelPhoto = () => {
+    setCapturedPhoto(null);
+    setReasonText('');
+    // Restart camera
+    const constraints = {
+      video: { facingMode: { ideal: 'environment' } }
+    };
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then(stream => {
+        setStream(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      })
+      .catch(err => {
+        console.log(`error when reopening camera: ${err}`);
+      });
   }
 
   const stopCamera = () => {
@@ -111,16 +139,13 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
       const dataUrl = event.target?.result as string;
       if (!dataUrl) return;
 
-      const base64Data = dataUrl;
-
       // 停止相機（如果有開啟）
       if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
         setStream(null);
       }
 
-      setPhotoBlob(base64Data);
-      setPage('loading answer');
+      setCapturedPhoto(dataUrl);
 
       // 清空 input，避免下次選同一張不觸發 onChange
       if (fileInputRef.current) {
@@ -136,17 +161,42 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
     fileInputRef.current?.click();
   };
 
+  if (capturedPhoto) {
+    return (
+      <div className="camera-container">
+        <img src={capturedPhoto} alt="captured" className="camera-feed" />
+
+        <div className="photo-overlay">
+          <div className="reason-form-modal">
+            <label className="reason-label">拍攝說明</label>
+            <textarea
+              className="reason-textarea"
+              placeholder="描述你發現的植物或拍攝環境..."
+              value={reasonText}
+              onChange={(e) => setReasonText(e.target.value)}
+            />
+          </div>
+
+          <div className="photo-controls">
+            <button className="btn btn-primary" onClick={handleSubmitPhoto}>✓ 提交</button>
+            <button className="btn btn-secondary" onClick={handleCancelPhoto}>↻ 重新拍攝</button>
+            <button className="btn btn-cancel" onClick={() => { setPage('question'); }}>✕ 取消</button>
+          </div>
+        </div>
+        <canvas ref={canvasRef} hidden />
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="camera-container">
       <video
         ref={videoRef}
         autoPlay
         playsInline
-        style={{ display: 'block', width: '100%', maxWidth: '500px', marginTop: '10px' }}
+        className="camera-feed"
       />
 
-      <label> Reason: </label><input onChange={(e) => { setReason(e.target.value) }} />
-      {/* 隱藏的檔案輸入框 */}
       <input
         type="file"
         accept="image/*"
@@ -154,10 +204,11 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
         onChange={handleFileChange}
         style={{ display: 'none' }}
       />
-      <div>
-        <button onClick={capturePhoto}> 拍照 </button>
-        <button onClick={openPhotoFile}>🖼️ 從相簿選擇</button>
-        <button onClick={() => { stopCamera(); setPage('question'); }}> 取消 </button>
+
+      <div className="camera-controls">
+        <button className="btn btn-primary" onClick={capturePhoto}>📷 拍照</button>
+        <button className="btn btn-secondary" onClick={openPhotoFile}>🖼️ 相簿</button>
+        <button className="btn btn-cancel" onClick={() => { stopCamera(); setPage('question'); }}>✕ 取消</button>
       </div>
       <canvas ref={canvasRef} hidden />
     </div>
@@ -177,21 +228,24 @@ export function UserChallengeLoadingAnswer({ plantAnswerType, reason, photoBlob,
         reason: reason.trim(),
         photoBlob,
       }).then(response => {
+        console.log('AI response received:', response);
         if (response) {
           setAIResponse(response);
         }
         setPage('answer')
       })
         .catch(err => {
-          console.log(`error when calling AI: ${err}`);
+          console.error(`error when calling AI:`, err);
+          alert(`Error: ${String(err)}`);
         })
     }
   }, []);
 
 
   return (
-    <div>
-      loading
+    <div className="challenge-loading">
+      <div className="loading-spinner"></div>
+      <p className="loading-text">AI 分析中...</p>
     </div>
   );
 }
@@ -211,42 +265,53 @@ export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photo
 
   if(!isPlant){
     return (
-      <div>
-          <div>🤔</div>
-          <div>這不是植物來哦！</div>
-          <button onClick={()=>{setPage('question')}}>再試一次</button>
+      <div className="result-screen">
+        <div className="result-emoji">🤔</div>
+        <div className="result-title">這不是植物呢</div>
+        <p className="result-message">無法識別圖片中的植物，請重新嘗試</p>
+        <button className="btn btn-primary result-btn" onClick={()=>{setPage('question')}}>再試一次</button>
       </div>
     )
   }
 
   return (
-    <div>
-      <h2>挑戰結果</h2>
-      <img src={photoBlob} alt="植物圖片" />
-      {JSON.stringify(aiResponse)}
-      {(correct && (
-        <div>
-          <div>🎉</div>
-          <div>答對了！</div>
-          <div>獲得 5 點經驗值</div>
+    <div className="result-screen">
+      <h2 className="result-page-title">挑戰結果</h2>
+
+      <img src={photoBlob} alt="植物圖片" className="result-image" />
+
+      {correct ? (
+        <div className="result-status result-status-correct">
+          <div className="result-emoji">🎉</div>
+          <div className="result-status-title">答對了！</div>
+          <p className="result-xp-text">獲得 <b>5 點經驗值</b></p>
         </div>
-      )) || (
-        <div>
-          <div>🤔</div>
-          <div>答錯了！</div>
-          <div>獲得 1 點經驗值</div>
+      ) : (
+        <div className="result-status result-status-incorrect">
+          <div className="result-emoji">🤔</div>
+          <div className="result-status-title">答錯了！</div>
+          <p className="result-xp-text">獲得 <b>1 點經驗值</b></p>
         </div>
       )}
-      <div>
-        <div>{plantCorrectName}</div>
-        <div>{plantCorrectScientificName}</div>
-        <div>{plantCorrectFunFact}</div>
+
+      {plantCorrectName && (
+        <div className="result-plant-info">
+          <p className="plant-info-name">{plantCorrectName}</p>
+          {plantCorrectScientificName && (
+            <p className="plant-info-scientific">{plantCorrectScientificName}</p>
+          )}
+          {plantCorrectFunFact && (
+            <p className="plant-info-funfact">{plantCorrectFunFact}</p>
+          )}
+        </div>
+      )}
+
+      <div className="hint-box">
+        <p className="hint-title">{correct ? '💡 延伸知識' : '💡 提示'}</p>
+        <p className="hint-content">{correct ? plant_types[questionId].extras : plant_types[questionId].hints}</p>
       </div>
-      <div>
-        <div>💡 提示</div>
-        <div> {(correct && plant_types[questionId].extra) || plant_types[questionId].hints} </div>
-      </div>
-      <button onClick={()=>{setPage('question')}}>再試一次</button>
+
+      <button className="btn btn-primary result-continue-btn" onClick={()=>{setPage('question')}}>{correct ? '下一題 →' : '再試一次 →'}</button>
     </div>
   );
 }

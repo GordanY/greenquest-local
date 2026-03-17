@@ -1,3 +1,13 @@
+/* ========== POKEDEX TITLE ========== */
+.pokedex-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    color: #059669;
+    margin-bottom: 1.5rem;
+}
+
+/* ========== POKEDEX GRID & CARDS ========== */
 .pokedex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -5,10 +15,304 @@
 }
 
 .pokedex-card {
-    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    text-align: center;
+    cursor: pointer;
     transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
 }
 
 .pokedex-card:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
+}
+
+.pokedex-card img {
+    width: 100%;
+    height: 5rem;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+}
+
+.pokedex-card p {
+    margin: 0;
+}
+
+.pokedex-card .plant-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pokedex-card .plant-type {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* ========== PLANT DETAIL MODAL ========== */
+.plant-detail-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.plant-detail-modal-content {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+    max-width: 42rem;
+    width: 100%;
+    margin: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.plant-detail-modal-body {
+    padding: 1.5rem;
+    text-align: left;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.plant-detail-image {
+    width: 100%;
+    max-height: 12rem;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.plant-detail-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.plant-detail-scientific-name {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.plant-detail-section {
+    margin-bottom: 0.75rem;
+}
+
+.plant-detail-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #059669;
+    margin-bottom: 0.25rem;
+}
+
+.plant-detail-section-content {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.plant-detail-fact {
+    background-color: #ecfdf5;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.plant-detail-fact-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #059669;
+    margin-bottom: 0.25rem;
+}
+
+.plant-detail-fact-content {
+    font-size: 0.75rem;
+    color: #4b5563;
+}
+
+.plant-detail-herbarium {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.plant-detail-herbarium-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+
+.plant-detail-herbarium-text {
+    font-size: 0.75rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.plant-detail-herbarium-link {
+    font-size: 0.75rem;
+    color: #2563eb;
+    text-decoration: underline;
+    transition: color 0.2s ease-in-out;
+}
+
+.plant-detail-herbarium-link:hover {
+    color: #1e40af;
+}
+
+.plant-detail-close-btn {
+    width: 100%;
+    background-color: #10b981;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.plant-detail-close-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.plant-detail-close-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ========== LOADING STATE ========== */
+.plant-detail-loading {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.loading-container {
+    text-align: center;
+}
+
+.loading-emoji {
+    font-size: 6rem;
+    margin-bottom: 1rem;
+}
+
+.loading-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.loading-subtitle {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.loading-spinner {
+    display: inline-flex;
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid transparent;
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    color: #4b5563;
+    font-size: 0.875rem;
+}
+
+/* ========== ERROR STATE ========== */
+.plant-detail-error {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.error-container {
+    text-align: center;
+}
+
+.error-emoji {
+    font-size: 6rem;
+    margin-bottom: 1rem;
+}
+
+.error-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.error-message {
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.error-close-btn {
+    background-color: #10b981;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.error-close-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.error-close-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ========== EMPTY STATE ========== */
+.pokedex-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #9ca3af;
+    padding: 2rem 0;
+}
+
+/* ========== LOADING STATE (DATA) ========== */
+.pokedex-loading {
+    text-align: center;
+    padding: 2rem 0;
 }

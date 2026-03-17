@@ -1,0 +1,375 @@
+/* ========== LOADING ========== */
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid transparent;
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ========== CHALLENGE QUESTION SCREEN ========== */
+.guest-challenge-question-screen {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  overflow: hidden;
+}
+
+.guest-challenge-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #059669;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.guest-challenge-question-card {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  justify-content: center;
+}
+
+.guest-plant-icon-large {
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.guest-current-challenge-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+  margin: 0;
+}
+
+.guest-plant-type-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #059669;
+  margin: 0;
+}
+
+.guest-plant-description {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+  max-width: 95%;
+}
+
+.guest-challenge-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guest-challenge-btn {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ========== BUTTONS ========== */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  font-size: 0.875rem;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.btn-primary {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.btn-cancel {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* ========== CAMERA ========== */
+.guest-camera-container {
+  position: absolute;
+  inset: 0;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 40;
+}
+
+.guest-camera-feed {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.guest-photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 30%, rgba(0, 0, 0, 0.95) 100%);
+  padding: 2rem 1rem 1rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.guest-reason-form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.guest-reason-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.guest-reason-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 0.875rem;
+  color: #374151;
+  background-color: white;
+  resize: none;
+  min-height: 60px;
+  max-height: 80px;
+  transition: border-color 0.2s;
+}
+
+.guest-reason-textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.guest-camera-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 50;
+}
+
+.guest-photo-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-around;
+}
+
+/* ========== RESULT SCREEN ========== */
+.guest-challenge-loading {
+  text-align: center;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.result-screen {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.result-page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #059669;
+  text-align: center;
+  margin: 0 0 1rem 0;
+}
+
+.result-image {
+  width: 100%;
+  border-radius: 0.75rem;
+  object-fit: cover;
+  max-height: 160px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.result-status {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  border: 2px solid #10b981;
+  background-color: #ecfdf5;
+}
+
+.result-emoji {
+  font-size: 2rem;
+  margin: 0;
+  margin-bottom: 0.25rem;
+}
+
+.result-status-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #059669;
+  margin: 0;
+  margin-bottom: 0.25rem;
+}
+
+.result-xp-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
+}
+
+.result-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #059669;
+  margin: 0;
+}
+
+.result-message {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+.result-plant-info {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.plant-info-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #059669;
+  margin: 0 0 0.25rem 0;
+}
+
+.plant-info-scientific {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-style: italic;
+  margin: 0 0 0.5rem 0;
+}
+
+.plant-info-funfact {
+  font-size: 0.875rem;
+  color: #6b7280;
+  background-color: #ecfdf5;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.hint-box {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  flex-shrink: 0;
+}
+
+.hint-title {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.hint-content {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.result-continue-btn,
+.result-btn {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: auto;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
