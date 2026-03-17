@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTable, useSpacetimeDB } from 'spacetimedb/react';
 import { tables, reducers } from '../../module_bindings';
 import { useReducer } from 'spacetimedb/react';
+import { Modal } from '../../components/Modal';
 import './AdminClassSessionManage.css';
 
 function generateAccessCode(): string {
@@ -20,6 +21,7 @@ export function AdminClassSessionManage({ onSelectSession }: { onSelectSession: 
   const [duration, setDuration] = useState(15);
   const [activeTab, setActiveTab] = useState<'active' | 'expired'>('active');
   const [contentReady, setContentReady] = useState(false);
+  const [modal, setModal] = useState<{ type: 'success' | 'error'; title: string; message: string; accessCode?: string } | null>(null);
   const createClassSession = useReducer(reducers.createClassSession);
   const { getConnection } = useSpacetimeDB();
 
@@ -49,11 +51,20 @@ export function AdminClassSessionManage({ onSelectSession }: { onSelectSession: 
     })
       .then(() => {
         console.log('Session created successfully, current sessions:', sessions.length);
-        alert(`課室已建立！\n課程碼: ${accessCode}`);
+        setModal({
+          type: 'success',
+          title: '課室已建立',
+          message: '課程現已可供學生加入',
+          accessCode: accessCode
+        });
       })
       .catch((err: any) => {
         console.error('Create session error:', err);
-        alert(`錯誤: ${String(err)}`);
+        setModal({
+          type: 'error',
+          title: '建立失敗',
+          message: String(err)
+        });
       });
   }
 
@@ -129,6 +140,16 @@ export function AdminClassSessionManage({ onSelectSession }: { onSelectSession: 
           ))
         )}
       </div>
+
+      {modal && (
+        <Modal
+          type={modal.type}
+          title={modal.title}
+          message={modal.message}
+          accessCode={modal.accessCode}
+          onConfirm={() => setModal(null)}
+        />
+      )}
     </div>
   );
 }

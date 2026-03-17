@@ -2,6 +2,7 @@ import { useTable } from 'spacetimedb/react';
 import { tables } from '../../module_bindings';
 import { createContext, useContext, useState } from 'react';
 import { useModeContext } from '../../context/ModeContext';
+import { Modal } from '../../components/Modal';
 import './GuestProfileForm.css';
 
 export interface GuestProfile {
@@ -34,6 +35,7 @@ export default function GuestProfileProvider({children}: {children: React.ReactN
         }
         return false;
     });
+    const [modal, setModal] = useState<{ type: 'error'; title: string; message: string } | null>(null);
 
     function handleSubmit(e: any) {
         e.preventDefault();
@@ -47,7 +49,11 @@ export default function GuestProfileProvider({children}: {children: React.ReactN
                 return setReady(true);
             }
         }
-        alert('課程碼或暱稱無效。請檢查並重試。');
+        setModal({
+            type: 'error',
+            title: '加入失敗',
+            message: '課程碼或暱稱無效。請檢查並重試。'
+        });
         return setReady(false);
     }
 
@@ -106,6 +112,15 @@ export default function GuestProfileProvider({children}: {children: React.ReactN
                             </button>
                         </form>
                     </div>
+
+                    {modal && (
+                        <Modal
+                            type={modal.type}
+                            title={modal.title}
+                            message={modal.message}
+                            onConfirm={() => setModal(null)}
+                        />
+                    )}
                 </div>
             )}
         </GuestProfileContext.Provider>

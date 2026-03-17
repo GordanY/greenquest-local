@@ -1,6 +1,7 @@
 import { useTable, useSpacetimeDB } from "spacetimedb/react";
 import { tables } from "../../module_bindings";
 import { useState, useRef, useEffect } from "react";
+import { Modal } from "../../components/Modal";
 import './UserChallenge.css';
 
 export function UserLoadingQuestion() {
@@ -123,6 +124,8 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
     }
   }
 
+  const [fileModal, setFileModal] = useState<{ type: 'error'; title: string; message: string } | null>(null);
+
   // ── 新增：處理選擇檔案 ────────────────────────────────
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,7 +133,11 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
 
     // 可選：檢查是不是圖片
     if (!file.type.startsWith('image/')) {
-      alert('請選擇圖片檔案');
+      setFileModal({
+        type: 'error',
+        title: '無效的檔案',
+        message: '請選擇圖片檔案'
+      });
       return;
     }
 
@@ -211,6 +218,15 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
         <button className="btn btn-cancel" onClick={() => { stopCamera(); setPage('question'); }}>✕ 取消</button>
       </div>
       <canvas ref={canvasRef} hidden />
+
+      {fileModal && (
+        <Modal
+          type={fileModal.type}
+          title={fileModal.title}
+          message={fileModal.message}
+          onConfirm={() => setFileModal(null)}
+        />
+      )}
     </div>
   );
 }
@@ -218,6 +234,7 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
 
 export function UserChallengeLoadingAnswer({ plantAnswerType, reason, photoBlob, setAIResponse, setPage }: { plantAnswerType: string, reason: string, photoBlob: string, setAIResponse: any, setPage: any }) {
   const { getConnection } = useSpacetimeDB();
+  const [aiModal, setAiModal] = useState<{ type: 'error' | 'warning'; title: string; message: string } | null>(null);
 
   useEffect(() => {
     const conn = getConnection();
@@ -233,13 +250,22 @@ export function UserChallengeLoadingAnswer({ plantAnswerType, reason, photoBlob,
           setAIResponse(response);
           setPage('answer');
         } else {
-          alert('Failed to get AI response. Please try again.');
-          setPage('question');
+          setAiModal({
+            type: 'warning',
+            title: '無法辨識',
+            message: '無法識別圖片中的植物，請重新嘗試'
+          });
+          setTimeout(() => setPage('question'), 2000);
         }
       })
         .catch(err => {
           console.error(`error when calling AI:`, err);
-          alert(`Error: ${String(err)}`);
+          setAiModal({
+            type: 'error',
+            title: '發生錯誤',
+            message: String(err)
+          });
+          setTimeout(() => setPage('question'), 2000);
         })
     }
   }, []);
@@ -249,6 +275,17 @@ export function UserChallengeLoadingAnswer({ plantAnswerType, reason, photoBlob,
     <div className="challenge-loading">
       <div className="loading-spinner"></div>
       <p className="loading-text">AI 分析中...</p>
+      {aiModal && (
+        <Modal
+          type={aiModal.type}
+          title={aiModal.title}
+          message={aiModal.message}
+          onConfirm={() => {
+            setAiModal(null);
+            setPage('question');
+          }}
+        />
+      )}
     </div>
   );
 }

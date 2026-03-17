@@ -11,6 +11,7 @@ import { UserRanking } from './UserRanking';
 import { AdminClassSessionManage } from './AdminClassSessionManage';
 import { AdminClassSession } from './AdminClassSession';
 import { AdminClassSessionResult } from './AdminClassSessionResult';
+import { Modal } from '../../components/Modal';
 import './UserHome.css';
 
 export default function UserHome() {
@@ -26,6 +27,7 @@ export default function UserHome() {
   const [adminSubPage, setAdminSubPage] = useState<'manage' | 'session' | 'result'>('manage');
   const [selectedSessionCode, setSelectedSessionCode] = useState('');
   const [selectedPlantType, setSelectedPlantType] = useState('');
+  const [modal, setModal] = useState<{ type: 'error' | 'success' | 'warning'; title: string; message: string } | null>(null);
   const createNewUser = useReducer(reducers.createNewUser);
   const activateAdmin = useReducer(reducers.activateAdmin);
   const { getConnection } = useSpacetimeDB();
@@ -57,17 +59,32 @@ export default function UserHome() {
   function handleAdminSubmit(e: any) {
     e.preventDefault();
     if (!adminPasscode.trim()) {
-      alert('請輸入管理員密碼');
+      setModal({
+        type: 'warning',
+        title: '缺少密碼',
+        message: '請輸入管理員密碼'
+      });
       return;
     }
     activateAdmin({ key: adminPasscode })
       .then(() => {
-        alert('管理員權限已啟用！');
-        setShowAdminModal(false);
-        setAdminPasscode('');
+        setModal({
+          type: 'success',
+          title: '成功',
+          message: '管理員權限已啟用！'
+        });
+        setTimeout(() => {
+          setShowAdminModal(false);
+          setAdminPasscode('');
+          setModal(null);
+        }, 1500);
       })
       .catch((err: any) => {
-        alert(`錯誤: ${String(err)}`);
+        setModal({
+          type: 'error',
+          title: '啟用失敗',
+          message: String(err)
+        });
         console.error('Admin activation error:', err);
       });
   }
@@ -238,6 +255,15 @@ export default function UserHome() {
               </button>
             )}
           </nav>
+
+          {modal && (
+            <Modal
+              type={modal.type}
+              title={modal.title}
+              message={modal.message}
+              onConfirm={() => setModal(null)}
+            />
+          )}
 
           {showAdminModal && (
             <div className="admin-modal-overlay">
