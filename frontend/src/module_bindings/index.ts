@@ -36,6 +36,7 @@ import {
 // Import all reducer arg schemas
 import ActivateAdminReducer from "./activate_admin_reducer";
 import AddAiProxyUrlReducer from "./add_ai_proxy_url_reducer";
+import ClaimDailyMissionReducer from "./claim_daily_mission_reducer";
 import CreateClassSessionReducer from "./create_class_session_reducer";
 import CreateNewUserReducer from "./create_new_user_reducer";
 import RemoveAiProxyUrlReducer from "./remove_ai_proxy_url_reducer";
@@ -48,6 +49,7 @@ import * as UserCallAiModelProcedure from "./user_call_ai_model_procedure";
 // Import all table schema definitions
 import ClassSessionsRow from "./class_sessions_table";
 import ClassSessionsUploadsRow from "./class_sessions_uploads_table";
+import GetMyMissionClaimsRow from "./get_my_mission_claims_table";
 import GetUserProfileRow from "./get_user_profile_table";
 import PlantTypesRow from "./plant_types_table";
 import UserRow from "./user_table";
@@ -103,6 +105,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, UserUploadsRow),
+  get_my_mission_claims: __table({
+    name: 'my_mission_claims',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, GetMyMissionClaimsRow),
   get_user_profile: __table({
     name: 'my_profile',
     indexes: [
@@ -116,6 +125,7 @@ const tablesSchema = __schema({
 const reducersSchema = __reducers(
   __reducerSchema("activate_admin", ActivateAdminReducer),
   __reducerSchema("add_ai_proxy_url", AddAiProxyUrlReducer),
+  __reducerSchema("claim_daily_mission", ClaimDailyMissionReducer),
   __reducerSchema("create_class_session", CreateClassSessionReducer),
   __reducerSchema("create_new_user", CreateNewUserReducer),
   __reducerSchema("remove_ai_proxy_url", RemoveAiProxyUrlReducer),

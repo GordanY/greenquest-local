@@ -8,6 +8,7 @@ import { UserPokedex } from './UserPokedex';
 import { UserShop } from './UserShop';
 import { UserChallenge } from './UserChallenge';
 import { UserRanking } from './UserRanking';
+import { UserTasks } from './UserTasks';
 import { AdminClassSessionManage } from './AdminClassSessionManage';
 import { AdminClassSession } from './AdminClassSession';
 import { AdminClassSessionResult } from './AdminClassSessionResult';
@@ -144,7 +145,9 @@ export default function UserHome() {
                     <span className="xp-text">{xpInCurrentLevel}/{xpNeededForNextLevel}</span>
                   </div>
                   <div className="header-buttons">
-                    {/* <button className="icon-button">🏆</button> */}
+                    <button className="icon-button tasks-btn" onClick={() => setPage('tasks')} title="每日任務">
+                      📋
+                    </button>
                     <div className="seed-display">
                       <span className="seed-emoji">🌿</span>
                       <span className="seed-count">{seeds}</span>
@@ -161,6 +164,7 @@ export default function UserHome() {
             )}
             {page === 'challenge' && <UserChallenge />}
             {page === 'ranking' && <UserRanking />}
+            {page === 'tasks' && <UserTasks onBack={() => setPage('home')} />}
             {page === 'shop' && <UserShop />}
             {page === 'pokedex' && <UserPokedex />}
             {page === 'admin' && (

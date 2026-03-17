@@ -21,6 +21,13 @@ export const AiProxyUrl = __t.object("AiProxyUrl", {
 });
 export type AiProxyUrl = __Infer<typeof AiProxyUrl>;
 
+export const Claim = __t.object("Claim", {
+  id: __t.u64(),
+  missionId: __t.string(),
+  claimDate: __t.string(),
+});
+export type Claim = __Infer<typeof Claim>;
+
 export const ClassSessions = __t.object("ClassSessions", {
   accessCode: __t.string(),
   creatorId: __t.identity(),
@@ -53,6 +60,9 @@ export const Data = __t.object("Data", {
 });
 export type Data = __Infer<typeof Data>;
 
+export const GetMyMissionClaims = __t.object("GetMyMissionClaims", {});
+export type GetMyMissionClaims = __Infer<typeof GetMyMissionClaims>;
+
 export const GetUserProfile = __t.object("GetUserProfile", {});
 export type GetUserProfile = __Infer<typeof GetUserProfile>;
 
@@ -78,6 +88,14 @@ export const User = __t.object("User", {
   role: __t.string(),
 });
 export type User = __Infer<typeof User>;
+
+export const UserDailyMissionClaims = __t.object("UserDailyMissionClaims", {
+  id: __t.u64(),
+  userId: __t.identity(),
+  missionId: __t.string(),
+  claimDate: __t.string(),
+});
+export type UserDailyMissionClaims = __Infer<typeof UserDailyMissionClaims>;
 
 export const UserProfile = __t.object("UserProfile", {
   userId: __t.identity(),

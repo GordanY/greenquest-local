@@ -95,6 +95,18 @@ const ai_proxy_url = table(
   }
 )
 
+const user_daily_mission_claims = table(
+  {
+    public: false,
+    indexes: [{ name: 'user_daily_mission_claims_user_id', algorithm: 'btree', columns: ['userId'] }]
+  },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    userId: t.identity(),
+    missionId: t.string(),
+    claimDate: t.string(),
+  }
+);
 
 const spacetimedb = schema({
   user,
@@ -105,7 +117,8 @@ const spacetimedb = schema({
   user_uploads,
   class_sessions,
   class_sessions_uploads,
-  ai_proxy_url
+  ai_proxy_url,
+  user_daily_mission_claims
 });
 export default spacetimedb;
 
@@ -300,6 +313,30 @@ export const get_user_profile = spacetimedb.view({ name: 'my_profile', public: t
   }
   return user_profile;
 });
+
+export const get_my_mission_claims = spacetimedb.view(
+  { name: 'my_mission_claims', public: true },
+  t.array(
+    t.object('claim', {
+      id: t.u64(),
+      missionId: t.string(),
+      claimDate: t.string(),
+    })
+  ),
+  ctx => {
+    const claims: { id: bigint; missionId: string; claimDate: string }[] = [];
+    for (const claim of ctx.db.user_daily_mission_claims.iter()) {
+      if (claim.userId.toHexString() === ctx.sender.toHexString()) {
+        claims.push({
+          id: claim.id,
+          missionId: claim.missionId,
+          claimDate: claim.claimDate,
+        });
+      }
+    }
+    return claims;
+  }
+);
 
 export const add_ai_proxy_url = spacetimedb.reducer({ proxy_url: t.string() }, (ctx, { proxy_url }) => {
   ctx.db.ai_proxy_url.insert({
@@ -540,6 +577,64 @@ export const get_plant_detail = spacetimedb.procedure(
       blooming_season: aiResponse.bloomingSeason || '',
       description: aiResponse.description || ''
     };
+  }
+);
+
+const MISSIONS: Record<string, { reward: number; requiredCategory: string | null }> = {
+  dailyChallenge:        { reward: 20, requiredCategory: null },
+  challengeNonVascular:  { reward: 15, requiredCategory: '非維管植物' },
+  challengeVascular:     { reward: 15, requiredCategory: '維管植物' },
+  challengeSeedless:     { reward: 15, requiredCategory: '無種子植物' },
+  challengeSeeded:       { reward: 15, requiredCategory: '種子植物' },
+  challengeNonFlowering: { reward: 15, requiredCategory: '無花植物' },
+  challengeFlowering:    { reward: 15, requiredCategory: '有花植物' },
+};
+
+export const claim_daily_mission = spacetimedb.reducer(
+  { missionId: t.string() },
+  (ctx, { missionId }) => {
+    const mission = MISSIONS[missionId];
+    if (!mission) throw new SenderError('Unknown mission'); 
+
+    // Compute today's UTC date string
+    const nowMs = ctx.timestamp.microsSinceUnixEpoch / 1000n;
+    const todayDate = new Date(Number(nowMs)).toISOString().slice(0, 10);
+
+    // Check already claimed
+    for (const claim of ctx.db.user_daily_mission_claims.iter()) {
+      if (claim.userId.toHexString() !== ctx.sender.toHexString()) continue;
+      if (claim.missionId === missionId && claim.claimDate === todayDate) {
+        throw new SenderError('Already claimed today');
+      }
+    }
+
+    // Compute start-of-today in ms
+    const today = new Date(Number(nowMs));
+    const todayStartMs = Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate()
+    );
+
+    // Verify completion via user_uploads
+    let completed = false;
+    for (const upload of ctx.db.user_uploads.iter()) {
+      if (upload.user_id.toHexString() !== ctx.sender.toHexString()) continue;
+      if (upload.timestamp < todayStartMs) continue;
+      if (mission.requiredCategory === null || upload.plant_correct_type === mission.requiredCategory) {
+        completed = true;
+        break;
+      }
+    }
+    if (!completed) throw new SenderError('Mission not completed today');
+
+    // Award seeds
+    const profile = ctx.db.user_profile.user_id.find(ctx.sender);
+    if (!profile) throw new SenderError('Profile not found');
+    ctx.db.user_profile.user_id.update({ ...profile, seeds: profile.seeds + mission.reward });
+
+    // Record claim
+    ctx.db.user_daily_mission_claims.insert({ id: 0n, userId: ctx.sender, missionId, claimDate: todayDate });
   }
 );
 
