@@ -38,6 +38,7 @@ export default function UserHome() {
   useEffect(()=>{
     // Initialize when both profile is ready and data is populated
     if (profile_ready && my_profile.length > 0) {
+      console.log(`my_profile: ${profile_ready} ${my_profile}`);
       setUserInited(true);
     }
   }, [profile_ready, my_profile]);
@@ -52,6 +53,9 @@ export default function UserHome() {
       name: user?.name,
       petType: selectedPet,
       petName: petName
+    }).then(()=>{
+      console.log(`now get profile: ${profile_ready} ${my_profile[0]}`)
+      setUserInited(true);
     }).catch(err => {
       console.log(`error when createNewUser: ${err}`);
     });
@@ -156,7 +160,12 @@ export default function UserHome() {
                 </header>
                 <main className="pet-section">
                   <div className="pet-display-area">
-                    <img src={petImage} alt="pet" className="pet-image" />
+                    <div className="pet-with-hat">
+                      <img src={petImage} alt="pet" className="pet-image" />
+                      {profile?.hatEquipped && (
+                        <img src="/accessories/Hat.png" alt="hat" className="pet-hat" />
+                      )}
+                    </div>
                     <p className="pet-name">{profile?.petName}</p>
                   </div>
                 </main>

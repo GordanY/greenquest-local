@@ -190,6 +190,50 @@
   gap: 0.5rem;
 }
 
+/* ========== BOOSTER BADGE ========== */
+.booster-badge {
+  background-color: #fbbf24;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ========== ERROR BANNER ========== */
+.error-banner {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ========== EQUIP BUTTON SPECIAL STATE ========== */
+.buy-btn.equipped {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buy-btn.equipped.active {
+  background-color: #10b981;
+  color: white;
+}
+
+.buy-btn.equipped.owned {
+  background-color: #d1d5db;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.buy-btn.equipped.owned:hover {
+  background-color: #e5e7eb;
+}
+
 /* ========== PURCHASE CONFIRMATION ========== */
 .purchase-modal {
   position: fixed;

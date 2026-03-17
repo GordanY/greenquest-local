@@ -133,10 +133,24 @@
   text-align: center;
 }
 
+.pet-with-hat {
+  position: relative;
+  display: inline-block;
+}
+
 .pet-image {
   height: 16rem;
   width: auto;
   filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+}
+
+.pet-hat {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  pointer-events: none;
 }
 
 .pet-name {

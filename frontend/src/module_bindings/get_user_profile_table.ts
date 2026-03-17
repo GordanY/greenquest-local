@@ -17,4 +17,7 @@ export default __t.row({
   petType: __t.string().name("pet_type"),
   petStage: __t.f64().name("pet_stage"),
   petName: __t.string().name("pet_name"),
+  hasHat: __t.bool().name("has_hat"),
+  hatEquipped: __t.bool().name("hat_equipped"),
+  xpBoostCount: __t.f64().name("xp_boost_count"),
 });

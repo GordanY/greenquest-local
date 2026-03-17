@@ -39,7 +39,9 @@ import AddAiProxyUrlReducer from "./add_ai_proxy_url_reducer";
 import ClaimDailyMissionReducer from "./claim_daily_mission_reducer";
 import CreateClassSessionReducer from "./create_class_session_reducer";
 import CreateNewUserReducer from "./create_new_user_reducer";
+import PurchaseShopItemReducer from "./purchase_shop_item_reducer";
 import RemoveAiProxyUrlReducer from "./remove_ai_proxy_url_reducer";
+import ToggleHatReducer from "./toggle_hat_reducer";
 
 // Import all procedure arg schemas
 import * as GetPlantDetailProcedure from "./get_plant_detail_procedure";
@@ -128,7 +130,9 @@ const reducersSchema = __reducers(
   __reducerSchema("claim_daily_mission", ClaimDailyMissionReducer),
   __reducerSchema("create_class_session", CreateClassSessionReducer),
   __reducerSchema("create_new_user", CreateNewUserReducer),
+  __reducerSchema("purchase_shop_item", PurchaseShopItemReducer),
   __reducerSchema("remove_ai_proxy_url", RemoveAiProxyUrlReducer),
+  __reducerSchema("toggle_hat", ToggleHatReducer),
 );
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */

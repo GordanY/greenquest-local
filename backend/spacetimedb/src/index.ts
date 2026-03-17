@@ -28,6 +28,9 @@ const user_profile = table(
     pet_type: t.string(),              // type of pet the user has
     pet_stage: t.number().default(1),             // level of the user's pet
     pet_name: t.string().default('小種籽'),              // name of the user's pet
+    has_hat: t.bool().default(false),       // hat unlocked forever after purchase
+    hat_equipped: t.bool().default(false),  // current equip state (toggle)
+    xp_boost_count: t.number().default(0),  // stackable booster count
   }
 );
 
@@ -252,6 +255,47 @@ export const init = spacetimedb.init(ctx => {
   });
 });
 
+const SHOP_ITEMS: Record<string, { price: number; type: 'decoration' | 'consumable' }> = {
+  hat_1:        { price: 150, type: 'decoration' },
+  special_feed: { price: 50,  type: 'consumable' },
+};
+
+export const purchase_shop_item = spacetimedb.reducer(
+  { itemId: t.string() },
+  (ctx, { itemId }) => {
+    const item = SHOP_ITEMS[itemId];
+    if (!item) throw new SenderError('Unknown item');
+
+    const profile = ctx.db.user_profile.user_id.find(ctx.sender);
+    if (!profile) throw new SenderError('Profile not found');
+
+    if (itemId === 'hat_1' && profile.has_hat) throw new SenderError('Already owned');
+    if (profile.seeds < item.price) throw new SenderError('Insufficient seeds');
+
+    if (itemId === 'hat_1') {
+      ctx.db.user_profile.user_id.update({
+        ...profile,
+        seeds: profile.seeds - item.price,
+        has_hat: true,
+        hat_equipped: true,   // auto-equip on purchase
+      });
+    } else if (itemId === 'special_feed') {
+      ctx.db.user_profile.user_id.update({
+        ...profile,
+        seeds: profile.seeds - item.price,
+        xp_boost_count: profile.xp_boost_count + 1,
+      });
+    }
+  }
+);
+
+export const toggle_hat = spacetimedb.reducer({}, (ctx) => {
+  const profile = ctx.db.user_profile.user_id.find(ctx.sender);
+  if (!profile) throw new SenderError('Profile not found');
+  if (!profile.has_hat) throw new SenderError('Hat not owned');
+  ctx.db.user_profile.user_id.update({ ...profile, hat_equipped: !profile.hat_equipped });
+});
+
 export const activate_admin = spacetimedb.reducer({ key: t.string() }, (ctx, { key }) => {
   const record = ctx.db.admin_activate_key.key.find(key);
   if (record && record.active) {
@@ -302,16 +346,17 @@ export const create_new_user = spacetimedb.reducer({ name: t.string(), pet_type:
     seeds: 100,
     pet_type,
     pet_stage: 1,
-    pet_name
+    pet_name,
+    has_hat: false,
+    hat_equipped: false,
+    xp_boost_count: 0
   });
 });
 
 export const get_user_profile = spacetimedb.view({ name: 'my_profile', public: true }, t.option(user_profile.rowType), ctx => {
   const user_profile = ctx.db.user_profile.user_id.find(ctx.sender);
-  if (!user_profile) {
-    throw new SenderError('User profile not found');
-  }
-  return user_profile;
+
+  return user_profile || undefined;
 });
 
 export const get_my_mission_claims = spacetimedb.view(
@@ -444,10 +489,16 @@ export const user_call_ai_model = spacetimedb.procedure(
 
         // Update user profile with XP
         const isCorrect = plant_answer_type === plant_correct_type;
-        const xpReward = isCorrect ? 5 : 1;
         const profile = txCtx.db.user_profile.user_id.find(ctx.sender);
         if (profile) {
-          const updatedProfile = { ...profile, experience_points: profile.experience_points + xpReward };
+          const hasBoost = profile.xp_boost_count > 0;
+          const baseXp = isCorrect ? 5 : 1;
+          const xpReward = hasBoost ? baseXp * 2 : baseXp;
+          const updatedProfile = {
+            ...profile,
+            experience_points: profile.experience_points + xpReward,
+            xp_boost_count: hasBoost ? profile.xp_boost_count - 1 : profile.xp_boost_count,
+          };
           txCtx.db.user_profile.user_id.update(updatedProfile);
         }
       });

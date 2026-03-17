@@ -104,6 +104,9 @@ export const UserProfile = __t.object("UserProfile", {
   petType: __t.string(),
   petStage: __t.f64(),
   petName: __t.string(),
+  hasHat: __t.bool(),
+  hatEquipped: __t.bool(),
+  xpBoostCount: __t.f64(),
 });
 export type UserProfile = __Infer<typeof UserProfile>;
 

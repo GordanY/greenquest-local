@@ -11,12 +11,16 @@ import AddAiProxyUrlReducer from "../add_ai_proxy_url_reducer";
 import ClaimDailyMissionReducer from "../claim_daily_mission_reducer";
 import CreateClassSessionReducer from "../create_class_session_reducer";
 import CreateNewUserReducer from "../create_new_user_reducer";
+import PurchaseShopItemReducer from "../purchase_shop_item_reducer";
 import RemoveAiProxyUrlReducer from "../remove_ai_proxy_url_reducer";
+import ToggleHatReducer from "../toggle_hat_reducer";
 
 export type ActivateAdminParams = __Infer<typeof ActivateAdminReducer>;
 export type AddAiProxyUrlParams = __Infer<typeof AddAiProxyUrlReducer>;
 export type ClaimDailyMissionParams = __Infer<typeof ClaimDailyMissionReducer>;
 export type CreateClassSessionParams = __Infer<typeof CreateClassSessionReducer>;
 export type CreateNewUserParams = __Infer<typeof CreateNewUserReducer>;
+export type PurchaseShopItemParams = __Infer<typeof PurchaseShopItemReducer>;
 export type RemoveAiProxyUrlParams = __Infer<typeof RemoveAiProxyUrlReducer>;
+export type ToggleHatParams = __Infer<typeof ToggleHatReducer>;
 
