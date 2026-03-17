@@ -20,6 +20,16 @@ export function UserShop(){
     const purchaseShopItem = useReducer(reducers.purchaseShopItem);
     const toggleHat = useReducer(reducers.toggleHat);
 
+    useEffect(() => {
+        console.log('[Shop] Data updated:', {
+            profile_ready,
+            my_profile_length: my_profile.length,
+            profile_exists: !!profile,
+            profile_seeds: profile?.seeds,
+            profile_xpBoost: profile?.xpBoostCount
+        });
+    }, [my_profile, profile_ready]);
+
     const profile = my_profile[0];
     const userLevel = profile?.petStage || 1;
     const userSeeds = profile?.seeds || 0;
@@ -47,23 +57,31 @@ export function UserShop(){
         if (!purchaseModal) return;
         try {
             setError(null);
-            await purchaseShopItem({ itemId: purchaseModal.id });
+            console.warn('[Shop] Starting purchase:', purchaseModal.id);
+            const result = await purchaseShopItem({ itemId: purchaseModal.id });
+            console.warn('[Shop] Purchase completed:', result);
             setPurchaseModal(null);
         } catch (err) {
+            console.error('[Shop] Purchase error:', err);
             setError(String(err));
+            // Don't close modal on error
         }
     };
 
     const handleToggleHat = async () => {
         try {
             setError(null);
-            await toggleHat({});
+            console.warn('[Shop] Starting toggle hat');
+            const result = await toggleHat({});
+            console.warn('[Shop] Toggle hat completed:', result);
         } catch (err) {
+            console.error('[Shop] Toggle hat error:', err);
             setError(String(err));
         }
     };
 
-    if (!profile_ready) {
+    // Profile required flag gets set to false after mutations, so check data existence instead
+    if (!profile) {
         return (
             <div className="shop-loading">
                 <div className="loading-spinner"></div>

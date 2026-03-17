@@ -13,7 +13,10 @@ export function UserLoadingQuestion() {
   );
 }
 
-export function UserChallengeQuestionCard({ plant_types, questionId, setQuestionId, setPage }: { plant_types: any, questionId: number, setQuestionId: any, setPage: any }) {
+export function UserChallengeQuestionCard({ plant_types, questionId, setQuestionId, setPage, xpBoostCount }: { plant_types: any, questionId: number, setQuestionId: any, setPage: any, xpBoostCount: number }) {
+  const correctXp = xpBoostCount > 0 ? 10 : 5;
+  const incorrectXp = xpBoostCount > 0 ? 2 : 1;
+
   return (
     <div className="challenge-question-screen">
       <div className="page-title">植物挑戰</div>
@@ -28,12 +31,12 @@ export function UserChallengeQuestionCard({ plant_types, questionId, setQuestion
       <div className="challenge-rewards">
         <div className="reward-correct">
           <div className="reward-label-correct">答對獎勵</div>
-          <div className="reward-value-correct">+5 XP</div>
+          <div className="reward-value-correct">+{correctXp} XP{xpBoostCount > 0 ? ' ⚡' : ''}</div>
         </div>
         <div className="reward-divider"></div>
         <div className="reward-incorrect">
           <div className="reward-label-incorrect">答錯獎勵</div>
-          <div className="reward-value-incorrect">+1 XP</div>
+          <div className="reward-value-incorrect">+{incorrectXp} XP{xpBoostCount > 0 ? ' ⚡' : ''}</div>
         </div>
       </div>
 
@@ -291,7 +294,7 @@ export function UserChallengeLoadingAnswer({ plantAnswerType, reason, photoBlob,
 }
 
 
-export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photoBlob, setPage }: { plant_types: any, questionId: number, aiResponse: any, photoBlob: string | undefined, setPage: any }) {
+export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photoBlob, setPage, xpBoostCount }: { plant_types: any, questionId: number, aiResponse: any, photoBlob: string | undefined, setPage: any, xpBoostCount: number }) {
   const {
     isPlant,
     plantCorrectName,
@@ -299,7 +302,8 @@ export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photo
     plantCorrectType,
     plantCorrectFunFact
   } = aiResponse;
-
+  const correctXp = xpBoostCount > 0 ? 10 : 5;
+  const incorrectXp = xpBoostCount > 0 ? 2 : 1;
   console.log(`plant_types`, plant_types);
   const correct = (plant_types[questionId].name === plantCorrectType);
 
@@ -324,13 +328,13 @@ export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photo
         <div className="result-status result-status-correct">
           <div className="result-emoji">🎉</div>
           <div className="result-status-title">答對了！</div>
-          <p className="result-xp-text">獲得 <b>5 點經驗值</b></p>
+          <p className="result-xp-text">獲得 <b>{correctXp} 點經驗值</b></p>
         </div>
       ) : (
         <div className="result-status result-status-incorrect">
           <div className="result-emoji">🤔</div>
           <div className="result-status-title">答錯了！</div>
-          <p className="result-xp-text">獲得 <b>1 點經驗值</b></p>
+          <p className="result-xp-text">獲得 <b>{incorrectXp} 點經驗值</b></p>
         </div>
       )}
 
@@ -359,6 +363,7 @@ export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photo
 export function UserChallenge() {
   // draw a random question from DB
   const [plant_types, questionReady] = useTable(tables.plant_types);
+  const [my_profile] = useTable(tables.get_user_profile);
   const [questionId, setQuestionId] = useState(0);
   const [page, setPage] = useState('question'); // question / photo / loading answer / answer / loading question
 
@@ -367,12 +372,15 @@ export function UserChallenge() {
 
   const [aiResponse, setAIResponse] = useState<any>(undefined);
 
+  const profile = my_profile[0];
+  const xpBoostCount = profile?.xpBoostCount || 0;
+
   // click take photo or pick photo
 
   // loading screen
 
 
-  // answer screen 
+  // answer screen
 
 
   // correct --> extra , error --> hint
@@ -384,7 +392,8 @@ export function UserChallenge() {
       plant_types={plant_types}
       questionId={questionId}
       setQuestionId={setQuestionId}
-      setPage={setPage} />
+      setPage={setPage}
+      xpBoostCount={xpBoostCount} />
   } else if (page === 'photo') {
     return <UserChallengeCapturePhoto
       setPage={setPage}
@@ -404,6 +413,7 @@ export function UserChallenge() {
       aiResponse={aiResponse} 
       photoBlob={photoBlob}
       setPage={setPage}
+      xpBoostCount={xpBoostCount}
       />
   }
 }
