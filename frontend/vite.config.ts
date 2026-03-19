@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     https: { key: fs.readFileSync('self-signed-ssh-cert/key.pem'), cert: fs.readFileSync('self-signed-ssh-cert/cert.pem') },
     host: '0.0.0.0', 
-    port: 3000,
+    port: 3001,
     proxy: {
         '/v1': {
           target: 'http://localhost:3000',   // spacetimedb host on your server

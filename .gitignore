@@ -1,6 +1,8 @@
 original/**
 frontend/node_modules/**
+frontend/.env
 backend/spacetimedb/node_modules/**
 backend/spacetimedb/dist/**
+logs/**
 .claude/**
 README_private.md

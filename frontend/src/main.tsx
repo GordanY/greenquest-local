@@ -4,15 +4,14 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import { ModeContextProvider } from './context/ModeContext';
 import { LoginContextProvider } from './context/LoginContext';
 import { HomePage } from './pages/HomePage';
+import { AUTH_DOMAIN, AUTH_CLIENT_ID } from './configs/configs';
 import './styles/ScreenBase.css';
-
-
 
 createRoot(document.getElementById('root')!).render(
   
     <Auth0Provider
-      domain="dev-760sns83i8q6y6jp.us.auth0.com"
-      clientId="XDFh0dE5aDgiVPXZaICxnU8uzgzmYz9z"
+      domain={AUTH_DOMAIN}
+      clientId={AUTH_CLIENT_ID}
       authorizationParams={{
         redirect_uri: window.location.origin,
       }}

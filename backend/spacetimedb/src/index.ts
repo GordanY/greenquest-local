@@ -131,57 +131,6 @@ export const init = spacetimedb.init(ctx => {
     key: 'let-me-in',
     active: true
   });
-
-
-  // Shop items
-  // ctx.db.shop_items.insert({
-  //   type: 'consumable',
-  //   name: '神奇營養液',
-  //   description: '下次挑戰經驗值加倍！',
-  //   price: 50,
-  //   icon: '🧪',
-  //   levelRequired: 1
-  // });
-  // ctx.db.shop_items.insert({
-  //   type: 'decoration',
-  //   name: '時尚草帽',
-  //   description: '為你的寵物添購一頂可愛的草帽。',
-  //   price: 150,
-  //   icon: '👒',
-  //   levelRequired: 1
-  // });
-  // ctx.db.shop_items.insert({
-  //   type: 'consumable',
-  //   name: '豐收肥料',
-  //   description: '立即獲得 100 顆種子！',
-  //   price: 200,
-  //   icon: '🌾',
-  //   levelRequired: 1
-  // });
-  // ctx.db.shop_items.insert({
-  //   type: 'decoration',
-  //   name: '酷炫墨鏡',
-  //   description: '為你的寵物戴上一副時尚墨鏡。',
-  //   price: 200,
-  //   icon: '🕶️',
-  //   levelRequired: 3
-  // });
-  // ctx.db.shop_items.insert({
-  //   type: 'decoration',
-  //   name: '花紋圍巾',
-  //   description: '柔軟溫暖的花紋圍巾。',
-  //   price: 250,
-  //   icon: '🧣',
-  //   levelRequired: 3
-  // });
-  // ctx.db.shop_items.insert({
-  //   type: 'decoration',
-  //   name: '植物學家之冠',
-  //   description: '屬於真正植物學家的榮耀之冠。',
-  //   price: 500,
-  //   icon: '👑',
-  //   levelRequired: 5
-  // });
   // plant types
   ctx.db.plant_types.insert({
     name: '非維管植物',
