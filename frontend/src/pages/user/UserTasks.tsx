@@ -20,6 +20,8 @@ const MISSIONS: Mission[] = [
   { id: 'challengeSeeded', icon: '🌰', name: '挑戰：辨識種子植物', reward: 15, requiredCategory: '種子植物' },
   { id: 'challengeNonFlowering', icon: '🌲', name: '挑戰：辨識無花植物', reward: 15, requiredCategory: '無花植物' },
   { id: 'challengeFlowering', icon: '🌸', name: '挑戰：辨識有花植物', reward: 15, requiredCategory: '有花植物' },
+  { id: 'challengeSingleLeaf', icon: '🌸', name: '挑戰：辨識單子葉植物', reward: 15, requiredCategory: '單子葉植物' },
+  { id: 'challengeDoubleLeaf', icon: '🌸', name: '挑戰：辨識雙子葉植物', reward: 15, requiredCategory: '雙子葉植物' },
 ];
 
 interface UserTasksProps {

@@ -2,7 +2,7 @@
 
 # Run this script to deploy both the backend and frontend server on your LAN
 
-export AI_PROXY_BASE_URL="replace this with your own ai proxy url"
+export AI_PROXY_BASE_URL="https://greenquestapi.mlwong3.workers.dev/"
 
 
 export LOCAL_IP=$(ifconfig | grep -Eo "inet (addr:)?([0-9]*\.){3}[0-9]*"  | grep -Eo "([0-9]*\.){3}[0-9]*" | grep -v "127.0.0.1")
@@ -29,3 +29,7 @@ echo "Go to Auth0(https://auth0.com/), create a new application, and set up:"
 echo "Allowed Callback URL: https://${LOCAL_IP}:3001"
 echo "Allowed Logout URL:   https://${LOCAL_IP}:3001"
 echo "Allowed Web Origins:  https://${LOCAL_IP}:3001"
+
+
+spacetime call greenquest-db create_new_user root seed seed --server local
+spacetime call greenquest-db activate_admin let-me-in --server local
