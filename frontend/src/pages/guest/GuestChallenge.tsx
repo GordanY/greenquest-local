@@ -133,6 +133,10 @@ export function GuestChallengeCapturePhoto({
   };
 
   const handleSubmitPhoto = () => {
+    if (!reasonText.trim()) {
+      setFileModal({ type: 'warning', title: '提示', message: '請填寫拍攝說明' });
+      return;
+    }
     setReason(reasonText.trim());
     setPhotoBlob(capturedPhoto!);
     setPage('loading answer');
@@ -225,6 +229,15 @@ export function GuestChallengeCapturePhoto({
           </div>
         </div>
         <canvas ref={canvasRef} hidden />
+
+        {fileModal && (
+          <Modal
+            type={fileModal.type}
+            title={fileModal.title}
+            message={fileModal.message}
+            onConfirm={() => setFileModal(null)}
+          />
+        )}
       </div>
     );
   }
