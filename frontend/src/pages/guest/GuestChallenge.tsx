@@ -167,7 +167,7 @@ export function GuestChallengeCapturePhoto({
     }
   };
 
-  const [fileModal, setFileModal] = useState<{ type: 'error'; title: string; message: string } | null>(null);
+  const [fileModal, setFileModal] = useState<{ type: 'error' | 'warning'; title: string; message: string } | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -366,7 +366,7 @@ export function GuestChallengeAnswer({
   photoBlob: string | undefined;
   setPage: (page: string) => void;
 }) {
-  const { isPlant, plantCorrectName, plantCorrectScientificName, plantCorrectType, plantCorrectFunFact } = aiResponse;
+  const { isPlant, plantCorrectName, plantCorrectScientificName, plantCorrectType, plantCorrectFunFact, reasonFeedback } = aiResponse;
   const correct = plantTypes[questionId]?.name === plantCorrectType;
 
   if (!isPlant) {
@@ -390,11 +390,13 @@ export function GuestChallengeAnswer({
         <div className="result-status result-status-correct">
           <div className="result-emoji">🎉</div>
           <div className="result-status-title">答對了！</div>
+          {reasonFeedback && <p className="reason-feedback-text reason-feedback-correct">{reasonFeedback}</p>}
         </div>
       ) : (
         <div className="result-status result-status-incorrect">
           <div className="result-emoji">🤔</div>
           <div className="result-status-title">答錯了！</div>
+          {reasonFeedback && <p className="reason-feedback-text reason-feedback-incorrect">{reasonFeedback}</p>}
         </div>
       )}
 

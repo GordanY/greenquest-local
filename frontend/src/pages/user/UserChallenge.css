@@ -708,3 +708,23 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ========== REASON FEEDBACK ========== */
+.reason-feedback-text {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0.5rem 0 0 0;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  text-align: left;
+}
+
+.reason-feedback-correct {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.reason-feedback-incorrect {
+  background-color: #fef3c7;
+  color: #92400e;
+}

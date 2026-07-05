@@ -131,7 +131,7 @@ export function UserChallengeCapturePhoto({ setPage, setReason, setPhotoBlob }: 
     }
   }
 
-  const [fileModal, setFileModal] = useState<{ type: 'error'; title: string; message: string } | null>(null);
+  const [fileModal, setFileModal] = useState<{ type: 'error' | 'warning'; title: string; message: string } | null>(null);
 
   // ── 新增：處理選擇檔案 ────────────────────────────────
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -313,7 +313,8 @@ export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photo
     plantCorrectName,
     plantCorrectScientificName,
     plantCorrectType,
-    plantCorrectFunFact
+    plantCorrectFunFact,
+    reasonFeedback
   } = aiResponse;
   const correctXp = xpBoostCount > 0 ? 10 : 5;
   const incorrectXp = xpBoostCount > 0 ? 2 : 1;
@@ -342,12 +343,14 @@ export function UserChallengeAnswer({ plant_types, questionId, aiResponse, photo
           <div className="result-emoji">🎉</div>
           <div className="result-status-title">答對了！</div>
           <p className="result-xp-text">獲得 <b>{correctXp} 點經驗值</b></p>
+          {reasonFeedback && <p className="reason-feedback-text reason-feedback-correct">{reasonFeedback}</p>}
         </div>
       ) : (
         <div className="result-status result-status-incorrect">
           <div className="result-emoji">🤔</div>
           <div className="result-status-title">答錯了！</div>
           <p className="result-xp-text">獲得 <b>{incorrectXp} 點經驗值</b></p>
+          {reasonFeedback && <p className="reason-feedback-text reason-feedback-incorrect">{reasonFeedback}</p>}
         </div>
       )}
 

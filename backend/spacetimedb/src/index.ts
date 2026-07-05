@@ -57,6 +57,7 @@ const user_uploads = table(
     plant_correct_scientific_name: t.string(),
     plant_correct_type: t.string(),
     plant_correct_fun_fact: t.string(),
+    reason_feedback: t.string(),
     timestamp: t.number()
   }
 );
@@ -87,6 +88,7 @@ const class_sessions_uploads = table(
     plant_correct_scientific_name: t.string(),
     plant_correct_type: t.string(),
     plant_correct_fun_fact: t.string(),
+    reason_feedback: t.string(),
     timestamp: t.number(),
   }
 );
@@ -355,12 +357,16 @@ const call_ai_model = (ctx: any, ai_proxy_url: string, { plant_answer_type, reas
     + '- 無花植物：僅限裸子植物（松、杉、柏、銀杏、蘇鐵，種子裸露無果實）\n'
     + '- 有花植物：所有被子植物（單子葉和雙子葉，開花並有果實包裹種子）\n\n'
     + '目標類別：' + plant_answer_type + '\n\n'
+    + '使用者提供了他們的判斷理由：「' + reason + '」\n'
+    + '請針對這個理由進行分析。如果答案正確，肯定使用者的觀察；如果答案錯誤，具體指出理由中的錯誤之處，'
+    + '並解釋為什麼該植物不屬於使用者選擇的分類。\n\n'
     + '請嚴格按照以下JSON格式回傳（不要加任何解釋）：\n'
     + '{ "isPlant": true, "matchesCategory": true, "plantName": "植物中文名", "scientificName": "拉丁學名", '
     + '"plantType": "非維管植物、維管植物、無種子植物、種子植物、無花植物、有花植物 之一", '
-    + '"funFact": "簡短有趣知識（30字左右）" }\n\n'
+    + '"funFact": "簡短有趣知識（30字左右）", '
+    + '"reasonFeedback": "針對使用者理由的具體回饋（30-50字）" }\n\n'
     + '若不是植物，回傳：\n'
-    + '{ "isPlant": false, "matchesCategory": false, "plantName": "", "scientificName": "", "plantType": "", "funFact": "" }';
+    + '{ "isPlant": false, "matchesCategory": false, "plantName": "", "scientificName": "", "plantType": "", "funFact": "", "reasonFeedback": "" }';
 
   const payload = {
     contents: [{ role: "user", parts: [{ text: prompt }, { inlineData: { mimeType: 'image/jpeg', data: photo_blob } }] }],
@@ -396,11 +402,12 @@ const call_ai_model = (ctx: any, ai_proxy_url: string, { plant_answer_type, reas
     plant_correct_name: aiResponse.plantName,
     plant_correct_scientific_name: aiResponse.scientificName,
     plant_correct_type: aiResponse.plantType,
-    plant_correct_fun_fact: aiResponse.funFact
+    plant_correct_fun_fact: aiResponse.funFact,
+    reason_feedback: aiResponse.reasonFeedback || ''
   }
 }
 
-const AI_RESPONSE = t.object('data', { is_plant: t.bool(),  plant_correct_name: t.string(), plant_correct_scientific_name: t.string(), plant_correct_type: t.string(), plant_correct_fun_fact: t.string() });
+const AI_RESPONSE = t.object('data', { is_plant: t.bool(),  plant_correct_name: t.string(), plant_correct_scientific_name: t.string(), plant_correct_type: t.string(), plant_correct_fun_fact: t.string(), reason_feedback: t.string() });
 
 
 export const user_call_ai_model = spacetimedb.procedure(
@@ -418,7 +425,7 @@ export const user_call_ai_model = spacetimedb.procedure(
 
     const aiResponse = call_ai_model(ctx, proxy_url, { plant_answer_type, reason, photo_blob: photo_blob.split(',')[1] });
 
-    const { is_plant, plant_correct_name, plant_correct_scientific_name, plant_correct_type, plant_correct_fun_fact } = aiResponse;
+    const { is_plant, plant_correct_name, plant_correct_scientific_name, plant_correct_type, plant_correct_fun_fact, reason_feedback } = aiResponse;
 
     if (is_plant) {
       ctx.withTx(txCtx => {
@@ -433,6 +440,7 @@ export const user_call_ai_model = spacetimedb.procedure(
           plant_correct_scientific_name,
           plant_correct_type,
           plant_correct_fun_fact,
+          reason_feedback,
           timestamp: Date.now()
         });
 
@@ -458,7 +466,8 @@ export const user_call_ai_model = spacetimedb.procedure(
       plant_correct_name,
       plant_correct_scientific_name,
       plant_correct_type,
-      plant_correct_fun_fact
+      plant_correct_fun_fact,
+      reason_feedback
     }
   }
 )
@@ -478,7 +487,7 @@ export const guest_call_ai_model = spacetimedb.procedure(
 
     const aiResponse = call_ai_model(ctx, proxy_url, { plant_answer_type, reason, photo_blob: photo_blob.split(',')[1] });
 
-    const { is_plant, plant_correct_name, plant_correct_scientific_name, plant_correct_type, plant_correct_fun_fact } = aiResponse;
+    const { is_plant, plant_correct_name, plant_correct_scientific_name, plant_correct_type, plant_correct_fun_fact, reason_feedback } = aiResponse;
 
     if (is_plant) {
       // Store the conversation in the database
@@ -494,6 +503,7 @@ export const guest_call_ai_model = spacetimedb.procedure(
           plant_correct_scientific_name,
           plant_correct_type,
           plant_correct_fun_fact,
+          reason_feedback,
           timestamp: Date.now()
         });
       });
@@ -504,7 +514,8 @@ export const guest_call_ai_model = spacetimedb.procedure(
       plant_correct_name,
       plant_correct_scientific_name,
       plant_correct_type,
-      plant_correct_fun_fact
+      plant_correct_fun_fact,
+      reason_feedback
     };
   });
 
