@@ -355,7 +355,9 @@ const call_ai_model = (ctx: any, ai_proxy_url: string, { plant_answer_type, reas
     + '- 無種子植物：僅限蕨類植物及其近親（有維管束但靠孢子繁殖）\n'
     + '- 種子植物：所有裸子植物（松、杉、銀杏）和被子植物（開花植物）\n'
     + '- 無花植物：僅限裸子植物（松、杉、柏、銀杏、蘇鐵，種子裸露無果實）\n'
-    + '- 有花植物：所有被子植物（單子葉和雙子葉，開花並有果實包裹種子）\n\n'
+    + '- 有花植物：所有被子植物（單子葉和雙子葉，開花並有果實包裹種子）\n'
+    + '- 單子葉植物：種子僅有一片子葉的被子植物（葉脈多為平行脈，具鬚根系，如水稻、玉米、小麥、百合）\n'
+    + '- 雙子葉植物：種子具有兩片子葉的被子植物（葉脈多為網狀脈，具直根系，如大豆、花生、玫瑰、榕樹）\n\n'
     + '目標類別：' + plant_answer_type + '\n\n'
     + '使用者提供了他們的判斷理由：「' + reason + '」\n'
     + '請針對這個理由進行分析。如果答案正確，肯定使用者的觀察；如果答案錯誤，具體指出理由中的錯誤之處，'
@@ -598,7 +600,7 @@ const MISSIONS: Record<string, { reward: number; requiredCategory: string | null
   challengeSeedless:     { reward: 15, requiredCategory: '無種子植物' },
   challengeSeeded:       { reward: 15, requiredCategory: '種子植物' },
   challengeNonFlowering: { reward: 15, requiredCategory: '無花植物' },
-  challengeFlowering:    { reward: 15, requiredCategory: '有花植物' },
+  challengeFlowering:    { reward: 15, requiredCategory: '有花植物' }
 };
 
 export const claim_daily_mission = spacetimedb.reducer(
