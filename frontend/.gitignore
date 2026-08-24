@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Generated self-signed HTTPS certificates for LAN deployment
+self-signed-ssh-cert/*.pem
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
